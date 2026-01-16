@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorites - Food Picker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="CSS-Foodpicker.css">
+    <style>
+        /* Header with Search and User Profile */
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            background: white;
+        }
+
+        .header-left h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: var(--accent);
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 200ms ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            background: #f5f5f5;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 200ms ease;
+        }
+
+        .user-profile:hover {
+            background: #e8e8e8;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        /* Recipe Grid */
+        .recipes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+        }
+
+        @media (max-width: 768px) {
+            .recipes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .recipe-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 200ms ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+        }
+
+        .recipe-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .recipe-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            overflow: hidden;
+        }
+
+        .recipe-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .recipe-content {
+            padding: 1.5rem;
+        }
+
+        .recipe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .recipe-card h3 {
+            margin: 0;
+            color: var(--accent);
+            font-size: 1.3rem;
+            flex: 1;
+        }
+
+        .recipe-rating {
+            display: flex;
+            gap: 0.2rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .star {
+            color: #ddd;
+            transition: color 200ms ease;
+        }
+
+        .star.filled {
+            color: #ffc107;
+        }
+
+        .recipe-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .recipe-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .recipe-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(30, 136, 229, 0.1);
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .recipe-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .recipe-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 200ms ease;
+        }
+
+        .recipe-btn:hover {
+            background: #f5f5f5;
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #999;
+        }
+
+        .empty-state h2 {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .profile-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sso-button {
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 200ms ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .sso-button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .google-btn {
+            border-color: #4285f4;
+            color: #4285f4;
+        }
+
+        .google-btn:hover {
+            background: rgba(66, 133, 244, 0.05);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-save {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            background: var(--accent);
+            color: white;
+            transition: all 200ms ease;
+        }
+
+        .btn-save:hover {
+            background: #1565c0;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background: #f0f0f0;
+            color: #333;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 200ms ease;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar-nav">
+        <a class="nav-link" href="Untitled-1.html" style="margin-bottom: 1rem;">← Back to Home</a>
+        <a class="nav-link" href="My_recipies.html"><h3>My Recipes</h3></a>
+        <a class="nav-link" href="HTML_Favorites.html"><h3>Favorites</h3></a>
+        <a class="nav-link" href="#"><h3>New Recipes</h3></a>
+    </nav>
+
+    <div class="content-wrapper">
+        <!-- Header with Search and User Profile -->
+        <div class="header-top">
+            <div class="header-left">
+                <h1>My Favorites</h1>
+            </div>
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="🔍 Search recipes...">
+            </div>
+            <div class="header-right">
+                <div class="user-profile" id="user-profile-btn">
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="user-name">User</div>
+                        <div class="user-email" id="user-email">user@example.com</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <main class="main" style="padding: 0; justify-content: flex-start;">
+            <div id="recipes-grid" class="recipes-grid"></div>
+        </main>
+    </div>
+
+    <!-- User Profile Modal -->
+    <div id="profile-modal" class="modal">
+        <div class="modal-content">
+            <h2>User Profile</h2>
+            <div class="profile-form">
+                <div class="form-group">
+                    <label for="profile-name">Name</label>
+                    <input type="text" id="profile-name" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label for="profile-email">Email</label>
+                    <input type="email" id="profile-email" placeholder="your@email.com">
+                </div>
+
+                <h3 style="margin-top: 1.5rem; color: var(--accent);">Sign In Options</h3>
+                <button type="button" class="sso-button google-btn" id="google-sso">
+                    🔵 Sign in with Google (Coming Soon)
+                </button>
+                <p style="font-size: 0.85rem; color: #999; text-align: center; margin-top: 1rem;">
+                    ℹ️ Google SSO integration requires backend setup.
+                </p>
+
+                <div class="form-actions" style="margin-top: 2rem;">
+                    <button type="button" class="btn-save" id="save-profile">Save Profile</button>
+                    <button type="button" class="btn-cancel" id="close-profile">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userData = { name: 'User', email: 'user@example.com' };
+        let favorites = [];
+
+        function init() {
+            loadUserProfile();
+            loadFavorites();
+            renderFavorites();
+            updateUserProfile();
+            setupEventListeners();
+        }
+
+        function loadUserProfile() {
+            const stored = localStorage.getItem('userProfile');
+            if (stored) userData = JSON.parse(stored);
+        }
+
+        function loadFavorites() {
+            const stored = localStorage.getItem('userFavorites');
+            favorites = stored ? JSON.parse(stored) : [];
+        }
+
+        function renderFavorites(searchTerm = '') {
+            const grid = document.getElementById('recipes-grid');
+            
+            let filtered = favorites;
+            if (searchTerm) {
+                filtered = favorites.filter(recipe =>
+                    recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    (recipe.tags && recipe.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())))
+                );
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <h2>💔 No Favorites Yet</h2>
+                        <p>Go to <a href="My_recipies.html" style="color: var(--accent); text-decoration: none;">My Recipes</a> and click the heart icon to add your favorite recipes!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(recipe => `
+                <div class="recipe-card" onclick="openRecipeDetail(${recipe.id})">
+                    <div class="recipe-image">
+                        ${recipe.image ? `<img src="${recipe.image}" onerror="this.innerHTML='🍳'">` : '🍳'}
+                    </div>
+                    <div class="recipe-content">
+                        <div class="recipe-header">
+                            <h3>${recipe.name}</h3>
+                            <div class="recipe-rating">${renderStars(recipe.rating)}</div>
+                        </div>
+                        <div class="recipe-meta">
+                            ${recipe.prepTime ? `<span>⏱️ ${recipe.prepTime} min</span>` : ''}<span>📂 ${recipe.category}</span>
+                        </div>
+                        ${recipe.tags && recipe.tags.length > 0 ? `<div class="recipe-tags">${recipe.tags.slice(0, 3).map(tag => `<span class="recipe-tag">${tag}</span>`).join('')}${recipe.tags.length > 3 ? `<span class="recipe-tag">+${recipe.tags.length - 3}</span>` : ''}</div>` : ''}
+                        <div class="recipe-actions" onclick="event.stopPropagation();">
+                            <button class="recipe-btn" onclick="removeFavorite(${recipe.id})" title="Remove from favorites">❤️ Favorite</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) stars += `<span class="star ${i <= rating ? 'filled' : ''}">★</span>`;
+            return stars;
+        }
+
+        function removeFavorite(id) {
+            favorites = favorites.filter(f => f.id !== id);
+            localStorage.setItem('userFavorites', JSON.stringify(favorites));
+            renderFavorites(document.getElementById('search-input').value);
+        }
+
+        function openRecipeDetail(id) {
+            const recipe = favorites.find(r => r.id === id);
+            if (!recipe) return;
+            
+            // Store this recipe and navigate to My Recipes
+            localStorage.setItem('recipeToOpen', recipe.id);
+            window.location.href = 'My_recipies.html';
+        }
+
+        function saveUserProfile() {
+            localStorage.setItem('userProfile', JSON.stringify(userData));
+            updateUserProfile();
+        }
+
+        function updateUserProfile() {
+            document.getElementById('user-name').textContent = userData.name;
+            document.getElementById('user-email').textContent = userData.email;
+            const initials = (userData.name.split(' ')[0][0] + (userData.name.split(' ')[1]?.[0] || '')).toUpperCase();
+            document.getElementById('user-avatar').textContent = initials;
+        }
+
+        function setupEventListeners() {
+            // User profile
+            document.getElementById('user-profile-btn').addEventListener('click', () => {
+                document.getElementById('profile-name').value = userData.name;
+                document.getElementById('profile-email').value = userData.email;
+                document.getElementById('profile-modal').classList.add('show');
+            });
+
+            document.getElementById('save-profile').addEventListener('click', () => {
+                userData.name = document.getElementById('profile-name').value || 'User';
+                userData.email = document.getElementById('profile-email').value || 'user@example.com';
+                saveUserProfile();
+                document.getElementById('profile-modal').classList.remove('show');
+            });
+
+            document.getElementById('close-profile').addEventListener('click', () => {
+                document.getElementById('profile-modal').classList.remove('show');
+            });
+
+            document.getElementById('profile-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'profile-modal') {
+                    document.getElementById('profile-modal').classList.remove('show');
+                }
+            });
+
+            document.getElementById('google-sso').addEventListener('click', () => {
+                alert('Google SSO integration requires backend setup.\n\nFor MVP, edit your profile manually.');
+            });
+
+            // Search - Global search across all recipes
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                if (query.trim()) {
+                    // Search all recipes, not just favorites
+                    const userRecipes = localStorage.getItem('userRecipes');
+                    if (userRecipes) {
+                        const recipes = JSON.parse(userRecipes);
+                        const allRecipes = [];
+                        
+                        // Flatten all recipes from all categories
+                        for (let categoryId in recipes) {
+                            if (Array.isArray(recipes[categoryId])) {
+                                allRecipes.push(...recipes[categoryId]);
+                            }
+                        }
+                        
+                        const results = allRecipes.filter(r => 
+                            r.name?.toLowerCase().includes(query) ||
+                            r.tags?.some(t => t.toLowerCase().includes(query))
+                        );
+                        
+                        if (results.length > 0) {
+                            // Navigate to My Recipes with search results
+                            localStorage.setItem('recipeToOpen', results[0].id);
+                            localStorage.setItem('searchResults', JSON.stringify(results));
+                            window.location.href = 'My_recipies.html';
+                        }
+                    }
+                } else {
+                    renderFavorites('');
+                }
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

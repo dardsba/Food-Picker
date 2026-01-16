@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipes with Your Ingredients</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="CSS-Foodpicker.css">
+    <style>
+        .ingredient-search-header {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .ingredient-search-header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+        }
+
+        .selected-ingredients {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .ingredient-tag {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .recipe-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 200ms ease, box-shadow 200ms ease;
+            cursor: pointer;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .recipe-card-image {
+            width: 100%;
+            height: 200px;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .recipe-card-body {
+            padding: 1.5rem;
+        }
+
+        .recipe-card-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .recipe-card-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .recipe-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .tag {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--accent);
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #999;
+        }
+
+        .empty-state h2 {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 200ms ease;
+            z-index: 100;
+        }
+
+        .back-button:hover {
+            background: #1565c0;
+        }
+
+        @media (max-width: 768px) {
+            .recipe-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+                gap: 1.5rem;
+            }
+
+            .ingredient-search-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .ingredient-search-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .selected-ingredients {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='Untitled-1.html'">← Back</button>
+
+    <div class="ingredient-search-header">
+        <h1>🧪 Recipes with Your Ingredients</h1>
+        <p>Showing recipes you can make with what you have</p>
+        <div class="selected-ingredients" id="selected-ingredients"></div>
+    </div>
+
+    <div id="recipes-container" class="recipe-grid">
+        <div class="empty-state">
+            <h2>Loading recipes...</h2>
+        </div>
+    </div>
+
+    <script>
+        let allRecipes = [];
+        let pantryIngredients = [];
+
+        function init() {
+            // Get pantry ingredients from localStorage
+            const stored = localStorage.getItem('pantryIngredients');
+            pantryIngredients = stored ? JSON.parse(stored) : [];
+
+            if (pantryIngredients.length === 0) {
+                showEmpty('No ingredients selected. Add some ingredients first!');
+                return;
+            }
+
+            // Display selected ingredients
+            displayIngredients();
+
+            // Get all recipes
+            const userRecipes = localStorage.getItem('userRecipes');
+            if (!userRecipes) {
+                showEmpty('No recipes found. Add some recipes first!');
+                return;
+            }
+
+            const recipes = JSON.parse(userRecipes);
+            allRecipes = [];
+
+            // Flatten all recipes from all categories
+            for (let categoryId in recipes) {
+                if (Array.isArray(recipes[categoryId])) {
+                    allRecipes.push(...recipes[categoryId]);
+                }
+            }
+
+            // Filter recipes by ingredients
+            const matchingRecipes = allRecipes.filter(recipe => {
+                const recipeIngredients = recipe.ingredients.toLowerCase();
+                return pantryIngredients.some(ing => 
+                    recipeIngredients.includes(ing.toLowerCase())
+                );
+            });
+
+            if (matchingRecipes.length === 0) {
+                showEmpty('No recipes found with your ingredients. Try adding more ingredients!');
+            } else {
+                displayRecipes(matchingRecipes);
+            }
+        }
+
+        function displayIngredients() {
+            const container = document.getElementById('selected-ingredients');
+            container.innerHTML = pantryIngredients.map(ing => 
+                `<div class="ingredient-tag">${ing}</div>`
+            ).join('');
+        }
+
+        function displayRecipes(recipes) {
+            const container = document.getElementById('recipes-container');
+            container.innerHTML = recipes.map(recipe => `
+                <div class="recipe-card" onclick="openRecipe(${recipe.id})">
+                    <div class="recipe-card-image">
+                        ${recipe.image ? `<img src="${recipe.image}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.innerHTML='🍳'">` : '🍳'}
+                    </div>
+                    <div class="recipe-card-body">
+                        <div class="recipe-card-name">${recipe.name}</div>
+                        <div class="recipe-card-meta">
+                            📂 ${recipe.category || 'Uncategorized'} ${recipe.prepTime ? '• ⏱️ ' + recipe.prepTime + ' min' : ''}
+                        </div>
+                        ${recipe.rating ? `<div style="color: #f39c12;">★ ${recipe.rating}/5</div>` : ''}
+                        ${recipe.tags && recipe.tags.length > 0 ? `
+                            <div class="recipe-card-tags">
+                                ${recipe.tags.map(tag => `<div class="tag">${tag}</div>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showEmpty(message) {
+            const container = document.getElementById('recipes-container');
+            container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;"><h2>${message}</h2></div>`;
+        }
+
+        function openRecipe(recipeId) {
+            localStorage.setItem('recipeToOpen', recipeId);
+            window.location.href = 'My_recipies.html';
+        }
+
+        init();
+    </script>
+</body>
+</html>

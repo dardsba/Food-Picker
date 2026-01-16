@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Picker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="CSS-Foodpicker.css">
+    <style>
+        /* Main page specific styles */
+        .main-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            background: white;
+        }
+
+        .main-header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: var(--accent);
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 200ms ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .button-recipe-row {
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .randomise-btn {
+            font-size: 1.6rem;
+            padding: 1.2rem 2rem;
+            border-radius: 14px;
+            border: 2px solid #1e88e5;
+            color: #1e88e5;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            transition: transform 200ms ease, box-shadow 200ms ease;
+            font-weight: 600;
+            flex-shrink: 0;
+            white-space: nowrap;
+            height: fit-content;
+        }
+
+        .randomise-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+        }
+
+        .randomise-btn:active {
+            transform: translateY(0);
+        }
+
+        .order-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--accent);
+            background: white;
+            color: var(--accent);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 200ms ease;
+        }
+
+        .order-btn:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+        }
+
+        .order-btn:active {
+            transform: translateY(0);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            background: #f5f5f5;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 200ms ease;
+        }
+
+        .user-profile:hover {
+            background: #e8e8e8;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        /* Last Recipe Display */
+        .last-recipe-container {
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .last-recipe-label {
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .last-recipe-display {
+            padding: 0;
+            border: none;
+            border-radius: 12px;
+            background: transparent;
+            font-size: 1.4rem;
+            color: var(--accent);
+            font-weight: 600;
+            min-height: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: none;
+            max-width: 300px;
+        }
+
+        .last-recipe-img-small {
+            width: 200px;
+            height: 200px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .last-recipe-img-small img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .last-recipe-desc {
+            font-size: 1rem;
+            text-align: center;
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+
+        /* Last Recipe Screen - Full Screen */
+        .last-recipe-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 500;
+            overflow-y: auto;
+            cursor: pointer;
+        }
+
+        .last-recipe-screen.show {
+            display: block;
+        }
+
+        .last-recipe-content {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            animation: slideUp 300ms ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .last-recipe-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .last-recipe-header h2 {
+            font-size: 2rem;
+            color: var(--accent);
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .last-recipe-header p {
+            color: #999;
+            font-size: 0.95rem;
+        }
+
+        .last-recipe-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 6rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .last-recipe-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .last-recipe-body {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .recipe-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .recipe-section h3 {
+            color: var(--accent);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 0.5rem;
+        }
+
+        .recipe-ingredients {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .ingredient-item {
+            padding: 0.75rem;
+            background: #f9f9f9;
+            border-left: 3px solid var(--accent);
+            border-radius: 4px;
+        }
+
+        .recipe-instructions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .instruction-step {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step-text {
+            flex: 1;
+            padding-top: 0.25rem;
+            line-height: 1.6;
+        }
+
+        .recipe-meta-info {
+            display: flex;
+            gap: 2rem;
+            padding: 1.5rem;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .meta-item strong {
+            color: var(--accent);
+        }
+
+        .close-hint {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+            font-size: 0.9rem;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 3rem;
+        }
+
+        /* Sidebar updates */
+        .sidebar-nav {
+            width: 200px;
+            background: #f5f5f5;
+            padding: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        /* Override main layout for header */
+        .content-wrapper {
+            margin-left: 200px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar-nav">
+        <a class="nav-link" href="My_recipies.html"><h3>My Recipes</h3></a>
+        <a class="nav-link" href="New_Recipes.html"><h3>New Recipes</h3></a>
+        <a class="nav-link" href="HTML_Favorites.html"><h3>Favorites</h3></a>
+        <a class="nav-link" href="Order_Foods.html"><h3>What We Order Today</h3></a>
+    </nav>
+
+    <div class="content-wrapper">
+        <!-- Header with Search and User Profile -->
+        <header class="main-header">
+            <h1>Food Picker</h1>
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="🔍 Search recipes...">
+            </div>
+            <div class="header-right">
+                <div class="user-profile" id="user-profile-btn">
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="user-name">User</div>
+                        <div class="user-email" id="user-email">user@example.com</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="main-content">
+                <!-- Section 1: What We Make Today - Connected to My Recipes -->
+                <div class="make-today-section">
+                    <button type="button" class="randomise-btn" id="make-today-btn">What We Make Today?</button>
+
+                    <!-- Recipe Display - Horizontal Layout -->
+                    <div class="recipe-horizontal-container" id="recipe-preview" style="cursor: pointer;">
+                        <div class="recipe-image-wrapper" id="recipe-display">
+                            <div class="recipe-image">🍳</div>
+                        </div>
+                        <div class="recipe-details-wrapper">
+                            <div class="recipe-details" id="recipe-details">
+                                <h3>Click to pick a recipe!</h3>
+                                <p>Select a recipe from your collection</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: What We Order Today - Multi-User -->
+                <div style="width: 100%; margin-top: 3rem; padding-top: 2rem; border-top: 2px solid var(--accent);">
+                    <h3 style="color: var(--accent); font-size: 1.4rem; margin-bottom: 1rem; text-align: center;">What We Order Today?</h3>
+                    <p style="color: #666; margin-bottom: 2rem; text-align: center;">Get a random food suggestion to order</p>
+                    
+                    <!-- Connected Users Section -->
+                    <div id="connected-users-section" style="display: flex; gap: 1rem; margin-bottom: 2rem; padding: 1.5rem; background: #f5f5f5; border-radius: 12px; flex-wrap: wrap; justify-content: center; align-items: center;">
+                        <div id="connected-users-container" style="display: flex; gap: 1rem; align-items: center;"></div>
+                        <button id="add-user-btn" style="padding: 0.8rem 1.5rem; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;" title="Connect another user (like spouse)">➕ Add User</button>
+                    </div>
+
+                    <!-- User Order Suggestion Section -->
+                    <div style="text-align: center;">
+                        <button id="order-today-btn" style="padding: 1rem 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.1rem; transition: transform 200ms ease; margin-bottom: 1.5rem;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">🎲 Suggest a Food to Order</button>
+                        
+                        <div id="order-suggestion" style="font-size: 2rem; color: var(--accent); font-weight: bold; min-height: 60px; display: flex; align-items: center; justify-content: center;">
+                            -
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add User Modal -->
+                <div id="add-user-modal" class="modal" style="display: none;">
+                    <div class="modal-content" style="max-width: 400px;">
+                        <h2>Connect Another User</h2>
+                        <input type="text" id="new-user-name" placeholder="Enter user name (e.g., Wife, Husband, Friend)" style="width: 100%; padding: 10px; margin: 10px 0; border: 2px solid var(--accent); border-radius: 8px; box-sizing: border-box;">
+                        <div class="modal-buttons">
+                            <button id="confirm-add-user" class="save-btn" style="background: var(--accent); color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Add</button>
+                            <button id="cancel-add-user" class="close-btn" style="background: #ddd; color: #333; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin-left: 10px;">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- What I Have at Home Section -->
+                <div id="pantry-section" style="width: 100%; text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 2px solid var(--accent);">
+                    <h3 style="color: var(--accent); font-size: 1.4rem; margin-bottom: 1.5rem;">🏠 What I Have at Home</h3>
+                    
+                    <div style="max-width: 500px; margin: 0 auto;">
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+                            <input type="text" id="ingredient-input" placeholder="Add ingredient..." style="flex: 1; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 1rem;">
+                            <button id="add-ingredient-btn" style="padding: 0.75rem 1.5rem; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">Add</button>
+                        </div>
+
+                        <div id="ingredients-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; min-height: 40px; align-content: flex-start;"></div>
+
+                        <button id="search-by-ingredients-btn" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 1rem; margin-top: 1rem;">🔍 Find Recipes with These Ingredients</button>
+                    </div>
+                </div>
+
+                <!-- Last Recipe History Display -->
+                <div id="last-recipe-history-section" style="width: 100%; text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e0e0e0;">
+                    <p style="font-size: 0.9rem; color: #999; margin-bottom: 1rem;">📋 Previous Pick:</p>
+                    <div id="last-recipe-history-display" style="max-width: 250px; margin: 0 auto;">
+                        <div style="font-size: 0.85rem; color: #bbb;">-</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Full Screen Last Recipe View -->
+    <div id="last-recipe-screen" class="last-recipe-screen" onclick="if(event.target.id==='last-recipe-screen') closeRecipeScreen()">
+        <div class="last-recipe-content">
+            <div class="last-recipe-header">
+                <p>👨‍🍳 Your Last Recipe</p>
+                <h2 id="recipe-name">No recipe picked yet</h2>
+            </div>
+
+            <div class="last-recipe-image" id="recipe-image">🍳</div>
+
+            <div class="last-recipe-body">
+                <div class="recipe-meta-info">
+                    <div class="meta-item">
+                        <strong>⏱️ Prep Time:</strong>
+                        <span id="recipe-time">-</span>
+                    </div>
+                    <div class="meta-item">
+                        <strong>📂 Category:</strong>
+                        <span id="recipe-category">-</span>
+                    </div>
+                    <div class="meta-item">
+                        <strong>⭐ Rating:</strong>
+                        <span id="recipe-rating">Not rated</span>
+                    </div>
+                </div>
+
+                <div class="recipe-section">
+                    <h3>Ingredients</h3>
+                    <div id="recipe-ingredients-list" class="recipe-ingredients"></div>
+                </div>
+
+                <div class="recipe-section">
+                    <h3>Instructions</h3>
+                    <div id="recipe-instructions-list" class="recipe-instructions"></div>
+                </div>
+
+                <div class="close-hint">
+                    Click anywhere to close • Or press ESC
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Profile Modal -->
+    <div id="profile-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2>User Profile</h2>
+            <div class="profile-form">
+                <div class="form-group">
+                    <label for="profile-name">Name</label>
+                    <input type="text" id="profile-name" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label for="profile-email">Email</label>
+                    <input type="email" id="profile-email" placeholder="your@email.com">
+                </div>
+
+                <h3 style="margin-top: 1.5rem; color: var(--accent);">Sign In Options</h3>
+                <button type="button" class="sso-button google-btn" id="google-sso">
+                    🔵 Sign in with Google (Coming Soon)
+                </button>
+                <p style="font-size: 0.85rem; color: #999; text-align: center; margin-top: 1rem;">
+                    ℹ️ Google SSO integration requires backend setup.
+                </p>
+
+                <div class="form-actions" style="margin-top: 2rem;">
+                    <button type="button" class="btn-save" id="save-profile">Save Profile</button>
+                    <button type="button" class="btn-cancel" id="close-profile">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .profile-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sso-button {
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 200ms ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .sso-button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .google-btn {
+            border-color: #4285f4;
+            color: #4285f4;
+        }
+
+        .google-btn:hover {
+            background: rgba(66, 133, 244, 0.05);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-save {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            background: var(--accent);
+            color: white;
+            transition: all 200ms ease;
+        }
+
+        .btn-save:hover {
+            background: #1565c0;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background: #f0f0f0;
+            color: #333;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 200ms ease;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+    </style>
+
+    <script>
+        let userData = { name: 'User', email: 'user@example.com' };
+        let lastRecipe = null;
+
+        function init() {
+            console.log('init() function called');
+            loadUserProfile();
+            loadLastRecipe();
+            updateUserProfile();
+            setupEventListeners();
+            updateLastRecipeDisplay();
+            
+            // Load and display previous recipe
+            const prevRecipe = localStorage.getItem('lastPickedRecipe');
+            if (prevRecipe) {
+                updatePreviousRecipeDisplay(JSON.parse(prevRecipe));
+            }
+            
+            // Load pantry ingredients
+            loadPantryIngredients();
+            
+            // Load and display connected users
+            displayConnectedUsers();
+        }
+
+        // Connected Users Management
+        function loadConnectedUsers() {
+            const stored = localStorage.getItem('connectedUsers');
+            return stored ? JSON.parse(stored) : [userData.name];
+        }
+
+        function saveConnectedUsers(users) {
+            localStorage.setItem('connectedUsers', JSON.stringify(users));
+        }
+
+        function displayConnectedUsers() {
+            const users = loadConnectedUsers();
+            const container = document.getElementById('connected-users-container');
+            if (container) {
+                container.innerHTML = users.map(userName => `
+                    <div style="display: flex; align-items: center; gap: 0.5rem; background: white; padding: 0.8rem 1.2rem; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
+                            ${userName.charAt(0).toUpperCase()}
+                        </div>
+                        <span style="font-weight: 600; color: #333;">${userName}</span>
+                        ${userName !== userData.name ? `<button onclick="removeConnectedUser('${userName}')" style="background: #ff6b6b; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">×</button>` : ''}
+                    </div>
+                `).join('');
+            }
+        }
+
+        function removeConnectedUser(userName) {
+            let users = loadConnectedUsers();
+            users = users.filter(u => u !== userName);
+            if (users.length === 0) {
+                users = [userData.name];
+            }
+            saveConnectedUsers(users);
+            displayConnectedUsers();
+        }
+
+        function addConnectedUser(userName) {
+            if (!userName || userName.trim() === '') {
+                alert('Please enter a user name');
+                return;
+            }
+            
+            let users = loadConnectedUsers();
+            const trimmedName = userName.trim();
+            
+            if (users.includes(trimmedName)) {
+                alert('This user is already connected!');
+                return;
+            }
+            
+            users.push(trimmedName);
+            saveConnectedUsers(users);
+            displayConnectedUsers();
+            
+            // Close modal
+            document.getElementById('add-user-modal').style.display = 'none';
+            document.getElementById('new-user-name').value = '';
+        }
+
+        function loadUserProfile() {
+            const stored = localStorage.getItem('userProfile');
+            if (stored) userData = JSON.parse(stored);
+        }
+
+        function saveUserProfile() {
+            localStorage.setItem('userProfile', JSON.stringify(userData));
+            updateUserProfile();
+        }
+
+        function updateUserProfile() {
+            document.getElementById('user-name').textContent = userData.name;
+            document.getElementById('user-email').textContent = userData.email;
+            const initials = (userData.name.split(' ')[0][0] + (userData.name.split(' ')[1]?.[0] || '')).toUpperCase();
+            document.getElementById('user-avatar').textContent = initials;
+        }
+
+        function loadLastRecipe() {
+            const stored = localStorage.getItem('lastPickedRecipe');
+            if (stored) lastRecipe = JSON.parse(stored);
+        }
+
+        function saveLastRecipe(recipe) {
+            lastRecipe = recipe;
+            localStorage.setItem('lastPickedRecipe', JSON.stringify(recipe));
+            updateLastRecipeDisplay();
+        }
+
+        function updateCurrentRecipeDisplay(recipe) {
+            lastRecipe = recipe;
+            const quickView = document.getElementById('last-recipe-quick');
+            if (recipe) {
+                quickView.innerHTML = `
+                    <div class="last-recipe-img-small">
+                        ${recipe.image ? `<img src="${recipe.image}" onerror="this.innerHTML='🍳'">` : '🍳'}
+                    </div>
+                    <div class="last-recipe-desc">${recipe.name}</div>
+                `;
+                quickView.style.cursor = 'pointer';
+            }
+        }
+
+        function savePreviousRecipe(recipe) {
+            localStorage.setItem('lastPickedRecipe', JSON.stringify(recipe));
+            updatePreviousRecipeDisplay(recipe);
+        }
+
+        function updatePreviousRecipeDisplay(recipe) {
+            const historyDiv = document.getElementById('last-recipe-history-display');
+            if (recipe) {
+                historyDiv.innerHTML = `
+                    <div style="font-size: 0.8rem; color: #999; max-width: 250px;">
+                        <div style="width: 160px; height: 160px; margin: 0 auto 0.75rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            ${recipe.image ? `<img src="${recipe.image}" onerror="this.innerHTML='🍳'" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">` : '🍳'}
+                        </div>
+                        <div style="font-weight: 500; color: #666; font-size: 0.9rem;">${recipe.name}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function showSearchSuggestions(results) {
+            // Create a dropdown list of suggestions
+            let existingDropdown = document.getElementById('search-suggestions');
+            if (existingDropdown) existingDropdown.remove();
+            
+            const dropdown = document.createElement('div');
+            dropdown.id = 'search-suggestions';
+            dropdown.style.cssText = 'position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e0e0e0; border-radius: 6px; max-height: 300px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 8px rgba(0,0,0,0.1);';
+            
+            dropdown.innerHTML = results.slice(0, 8).map((recipe, idx) => `
+                <div style="padding: 0.75rem 1rem; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 200ms;" 
+                     onmouseover="this.style.background='#f5f5f5'" 
+                     onmouseout="this.style.background='white'"
+                     onclick="selectSearchRecipe(${recipe.id})">
+                    <div style="font-weight: 500; color: var(--accent);">${recipe.name}</div>
+                    <div style="font-size: 0.8rem; color: #999;">${recipe.category}${recipe.tags && recipe.tags.length > 0 ? ' • ' + recipe.tags.join(', ') : ''}</div>
+                </div>
+            `).join('');
+            
+            const searchContainer = document.querySelector('.search-container');
+            if (searchContainer) {
+                searchContainer.style.position = 'relative';
+                searchContainer.appendChild(dropdown);
+            }
+        }
+
+        function selectSearchRecipe(recipeId) {
+            const userRecipes = localStorage.getItem('userRecipes');
+            if (userRecipes) {
+                const recipes = JSON.parse(userRecipes);
+                let selectedRecipe = null;
+                
+                for (let categoryId in recipes) {
+                    if (Array.isArray(recipes[categoryId])) {
+                        selectedRecipe = recipes[categoryId].find(r => r.id === recipeId);
+                        if (selectedRecipe) break;
+                    }
+                }
+                
+                if (selectedRecipe) {
+                    // Navigate to My Recipes with the selected recipe
+                    localStorage.setItem('recipeToOpen', recipeId);
+                    window.location.href = 'My_recipies.html';
+                }
+            }
+        }
+
+        function loadPantryIngredients() {
+            const stored = localStorage.getItem('pantryIngredients');
+            const ingredients = stored ? JSON.parse(stored) : [];
+            renderIngredients(ingredients);
+        }
+
+        function renderIngredients(ingredients) {
+            const container = document.getElementById('ingredients-list');
+            container.innerHTML = ingredients.map((ing, idx) => `
+                <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; background: rgba(102, 126, 234, 0.1); border-radius: 20px; border: 1px solid var(--accent);">
+                    <span style="color: #666; font-size: 0.9rem;">${ing}</span>
+                    <button onclick="removeIngredient(${idx})" style="background: none; border: none; color: var(--accent); cursor: pointer; font-weight: bold; padding: 0; margin-left: 0.25rem;">×</button>
+                </div>
+            `).join('');
+        }
+
+        function addIngredient() {
+            const input = document.getElementById('ingredient-input');
+            const ingredient = input.value.trim().toLowerCase();
+            
+            if (!ingredient) return;
+            
+            let ingredients = JSON.parse(localStorage.getItem('pantryIngredients')) || [];
+            if (!ingredients.includes(ingredient)) {
+                ingredients.push(ingredient);
+                localStorage.setItem('pantryIngredients', JSON.stringify(ingredients));
+                renderIngredients(ingredients);
+            }
+            
+            input.value = '';
+        }
+
+        function removeIngredient(idx) {
+            let ingredients = JSON.parse(localStorage.getItem('pantryIngredients')) || [];
+            ingredients.splice(idx, 1);
+            localStorage.setItem('pantryIngredients', JSON.stringify(ingredients));
+            renderIngredients(ingredients);
+        }
+
+        function searchByIngredients() {
+            const ingredients = JSON.parse(localStorage.getItem('pantryIngredients')) || [];
+            
+            if (ingredients.length === 0) {
+                alert('Please add some ingredients first!');
+                return;
+            }
+            
+            // Navigate to ingredient search page
+            window.location.href = 'Ingredient_Search.html';
+        }
+
+        function updateLastRecipeDisplay() {
+            const quickView = document.getElementById('last-recipe-quick');
+            if (lastRecipe) {
+                quickView.innerHTML = `
+                    <div class="last-recipe-img-small">
+                        ${lastRecipe.image ? `<img src="${lastRecipe.image}" onerror="this.innerHTML='🍳'">` : '🍳'}
+                    </div>
+                    <div class="last-recipe-desc">${lastRecipe.name}</div>
+                `;
+                quickView.style.cursor = 'pointer';
+            } else {
+                quickView.innerHTML = `
+                    <div class="last-recipe-img-small">🍳</div>
+                    <div class="last-recipe-desc">Click Randomise to pick!</div>
+                `;
+            }
+        }
+
+        function updateRecipeDisplay(recipe) {
+            if (!recipe) {
+                console.error('Recipe is null or undefined');
+                return;
+            }
+            
+            localStorage.setItem('currentMealRecipe', JSON.stringify(recipe));
+            
+            // Update image in recipe-display
+            const imageContainer = document.getElementById('recipe-display');
+            if (imageContainer) {
+                imageContainer.innerHTML = '';
+                
+                if (recipe.image) {
+                    const img = document.createElement('img');
+                    img.src = recipe.image;
+                    img.onerror = function() { this.parentElement.textContent = '🍳'; };
+                    imageContainer.appendChild(img);
+                } else {
+                    imageContainer.textContent = '🍳';
+                }
+            }
+            
+            // Update details in recipe-details
+            const detailsContainer = document.getElementById('recipe-details');
+            if (detailsContainer) {
+                // Format ingredients - they can be either a string or an array
+                let ingredientsText = 'No ingredients listed';
+                if (recipe.ingredients) {
+                    if (typeof recipe.ingredients === 'string') {
+                        // Split by newline and filter out empty lines
+                        ingredientsText = recipe.ingredients
+                            .split('\n')
+                            .filter(ing => ing.trim())
+                            .map(ing => ing.trim())
+                            .join('<br>');
+                    } else if (Array.isArray(recipe.ingredients)) {
+                        ingredientsText = recipe.ingredients.join('<br>');
+                    }
+                }
+                
+                detailsContainer.innerHTML = `
+                    <h3>${recipe.name || 'Unnamed Recipe'}</h3>
+                    <p><strong>Category:</strong> ${recipe.category || 'No category'}</p>
+                    <p><strong>Ingredients:</strong><br><span style="color: #555; font-size: 0.95em;">${ingredientsText}</span></p>
+                    ${recipe.rating ? `<p><strong>Rating:</strong> ${'⭐'.repeat(recipe.rating)}</p>` : ''}
+                    <p style="color: #1e88e5; margin-top: 1rem; font-weight: 600;">👆 Click to view full recipe</p>
+                `;
+            }
+        }
+
+        function setupEventListeners() {
+            console.log('setupEventListeners called');
+            
+            // User profile
+            const userProfileBtn = document.getElementById('user-profile-btn');
+            if (userProfileBtn) {
+                userProfileBtn.addEventListener('click', () => {
+                    document.getElementById('profile-name').value = userData.name;
+                    document.getElementById('profile-email').value = userData.email;
+                    document.getElementById('profile-modal').classList.add('show');
+                });
+            }
+
+            const saveProfileBtn = document.getElementById('save-profile');
+            if (saveProfileBtn) {
+                saveProfileBtn.addEventListener('click', () => {
+                    userData.name = document.getElementById('profile-name').value || 'User';
+                    userData.email = document.getElementById('profile-email').value || 'user@example.com';
+                    saveUserProfile();
+                    document.getElementById('profile-modal').classList.remove('show');
+                });
+            }
+
+            const closeProfileBtn = document.getElementById('close-profile');
+            if (closeProfileBtn) {
+                closeProfileBtn.addEventListener('click', () => {
+                    document.getElementById('profile-modal').classList.remove('show');
+                });
+            }
+
+            const profileModal = document.getElementById('profile-modal');
+            if (profileModal) {
+                profileModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'profile-modal') {
+                        document.getElementById('profile-modal').classList.remove('show');
+                    }
+                });
+            }
+
+            // Last recipe display
+            const lastRecipePreview = document.getElementById('last-recipe-preview');
+            if (lastRecipePreview) {
+                lastRecipePreview.addEventListener('click', () => {
+                    if (lastRecipe) {
+                        // Store recipe to open and navigate to My Recipes
+                        localStorage.setItem('recipeToOpen', lastRecipe.id);
+                        window.location.href = 'My_recipies.html';
+                    }
+                });
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeRecipeScreen();
+            });
+
+            // Add User Button - Connected Users
+            const addUserBtn = document.getElementById('add-user-btn');
+            if (addUserBtn) {
+                addUserBtn.addEventListener('click', () => {
+                    document.getElementById('add-user-modal').style.display = 'flex';
+                    document.getElementById('new-user-name').focus();
+                });
+            }
+
+            const confirmAddUserBtn = document.getElementById('confirm-add-user');
+            if (confirmAddUserBtn) {
+                confirmAddUserBtn.addEventListener('click', () => {
+                    const userName = document.getElementById('new-user-name').value;
+                    addConnectedUser(userName);
+                });
+            }
+
+            const cancelAddUserBtn = document.getElementById('cancel-add-user');
+            if (cancelAddUserBtn) {
+                cancelAddUserBtn.addEventListener('click', () => {
+                    document.getElementById('add-user-modal').style.display = 'none';
+                    document.getElementById('new-user-name').value = '';
+                });
+            }
+
+            // Close modal on Enter key
+            const newUserNameInput = document.getElementById('new-user-name');
+            if (newUserNameInput) {
+                newUserNameInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const userName = document.getElementById('new-user-name').value;
+                        addConnectedUser(userName);
+                    }
+                });
+            }
+
+            // What We Make Today button - Show random recipe
+            const makeTodayBtn = document.getElementById('make-today-btn');
+            console.log('makeTodayBtn element:', makeTodayBtn);
+            
+            if (makeTodayBtn) {
+                console.log('Attaching listener to make-today-btn');
+                makeTodayBtn.addEventListener('click', function() {
+                    console.log('Make Today button clicked!');
+                    try {
+                        const userRecipes = localStorage.getItem('userRecipes');
+                        console.log('userRecipes from localStorage:', userRecipes);
+                        
+                        if (!userRecipes) {
+                            alert('No recipes found. Go to My Recipes to add some!');
+                            return;
+                        }
+                        
+                        const recipes = JSON.parse(userRecipes);
+                        const allRecipes = [];
+                        
+                        // Flatten all recipes from all categories
+                        for (let categoryId in recipes) {
+                            if (Array.isArray(recipes[categoryId])) {
+                                allRecipes.push(...recipes[categoryId]);
+                            }
+                        }
+                        
+                        console.log('Total recipes found:', allRecipes.length);
+                        
+                        if (allRecipes.length === 0) {
+                            alert('No recipes found. Go to My Recipes to add some!');
+                            return;
+                        }
+                        
+                        const randomRecipe = allRecipes[Math.floor(Math.random() * allRecipes.length)];
+                        console.log('Selected random recipe:', randomRecipe);
+                        
+                        updateRecipeDisplay(randomRecipe);
+                        savePreviousRecipe(randomRecipe);
+                    } catch (error) {
+                        console.error('Error in make today button:', error);
+                        alert('Error loading recipe. Please try again.');
+                    }
+                });
+            } else {
+                console.error('make-today-btn element not found');
+            }
+
+            // Recipe display click - Go to My Recipes
+            const recipePreview = document.getElementById('recipe-preview');
+            if (recipePreview) {
+                recipePreview.addEventListener('click', function() {
+                    const stored = localStorage.getItem('currentMealRecipe');
+                    if (stored) {
+                        try {
+                            const recipe = JSON.parse(stored);
+                            if (recipe.id) {
+                                localStorage.setItem('recipeToOpen', recipe.id);
+                                window.location.href = 'My_recipies.html';
+                            }
+                        } catch (error) {
+                            console.error('Error navigating to recipe:', error);
+                            alert('Please click the button first to select a recipe.');
+                        }
+                    } else {
+                        alert('Please click the button first to select a recipe.');
+                    }
+                });
+            }
+
+            // What We Order Today button - Load from Order Foods page
+            const orderTodayBtn = document.getElementById('order-today-btn');
+            if (orderTodayBtn) {
+                orderTodayBtn.addEventListener('click', () => {
+                    const stored = localStorage.getItem('orderFoods');
+                    const foods = stored ? JSON.parse(stored) : [
+                        { id: 1, name: '🍕 Pizza' },
+                        { id: 2, name: '🍔 Burger' },
+                        { id: 3, name: '🍟 Fries' },
+                        { id: 4, name: '🌮 Tacos' },
+                        { id: 5, name: '🍣 Sushi' },
+                        { id: 6, name: '🍝 Pasta' }
+                    ];
+                    
+                    if (foods.length > 0) {
+                        const randomFood = foods[Math.floor(Math.random() * foods.length)];
+                        document.getElementById('order-suggestion').textContent = randomFood.name;
+                    }
+                });
+            }
+
+            // Search - Shows text suggestions without displaying recipe
+            let searchTimeout;
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const query = e.target.value.toLowerCase();
+                
+                if (query.trim()) {
+                    searchTimeout = setTimeout(() => {
+                        const userRecipes = localStorage.getItem('userRecipes');
+                        if (userRecipes) {
+                            const recipes = JSON.parse(userRecipes);
+                            const allRecipes = [];
+                            
+                            // Flatten all recipes from all categories
+                            for (let categoryId in recipes) {
+                                if (Array.isArray(recipes[categoryId])) {
+                                    allRecipes.push(...recipes[categoryId]);
+                                }
+                            }
+                            
+                            const results = allRecipes.filter(r => 
+                                r.name?.toLowerCase().includes(query) ||
+                                r.tags?.some(t => t.toLowerCase().includes(query))
+                            );
+                            
+                            if (results.length > 0) {
+                                // Save search results for navigation
+                                localStorage.setItem('searchResults', JSON.stringify(results));
+                                // Show popup with suggestions
+                                showSearchSuggestions(results);
+                            }
+                        }
+                    }, 800);
+                }
+            });
+
+            document.getElementById('google-sso').addEventListener('click', () => {
+                alert('Google SSO integration requires backend setup.\n\nFor MVP, edit your profile manually.');
+            });
+
+            // Pantry ingredient management
+            document.getElementById('add-ingredient-btn').addEventListener('click', addIngredient);
+            
+            document.getElementById('ingredient-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addIngredient();
+                }
+            });
+
+            document.getElementById('search-by-ingredients-btn').addEventListener('click', searchByIngredients);
+        }
+
+        function showRecipeScreen() {
+            if (!lastRecipe) return;
+
+            document.getElementById('recipe-name').textContent = lastRecipe.name;
+            document.getElementById('recipe-time').textContent = lastRecipe.prepTime ? `${lastRecipe.prepTime} min` : '—';
+            document.getElementById('recipe-category').textContent = lastRecipe.category;
+            document.getElementById('recipe-rating').textContent = lastRecipe.rating > 0 ? '★'.repeat(lastRecipe.rating) + ` (${lastRecipe.rating}/5)` : 'Not rated';
+
+            const recipeImage = document.getElementById('recipe-image');
+            if (lastRecipe.image) {
+                recipeImage.innerHTML = `<img src="${lastRecipe.image}" onerror="this.parentElement.innerHTML='🍳'">`;
+            } else {
+                recipeImage.innerHTML = '🍳';
+            }
+
+            const ingredientsList = document.getElementById('recipe-ingredients-list');
+            ingredientsList.innerHTML = lastRecipe.ingredients.split('\n').map(ing => `<div class="ingredient-item">${ing}</div>`).join('');
+
+            const instructionsList = document.getElementById('recipe-instructions-list');
+            const steps = lastRecipe.instructions.split('.').filter(s => s.trim());
+            instructionsList.innerHTML = steps.map((step, idx) => `
+                <div class="instruction-step">
+                    <div class="step-number">${idx + 1}</div>
+                    <div class="step-text">${step.trim()}${step.trim().endsWith('.') ? '' : '.'}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('last-recipe-screen').classList.add('show');
+        }
+
+        function closeRecipeScreen() {
+            document.getElementById('last-recipe-screen').classList.remove('show');
+        }
+
+        init();
+    </script>
+</body>
+</html>

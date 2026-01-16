@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Recipes - Food Picker</title>
+    <link rel="stylesheet" href="CSS-Foodpicker.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text&display=swap" rel="stylesheet">
+    <style>
+        .new-recipes-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .recipe-suggestion-card {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .recipe-suggestion-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .recipe-suggestion-card h3 {
+            margin: 10px 0;
+            color: var(--accent);
+            font-size: 1.3em;
+        }
+
+        .recipe-suggestion-card .emoji {
+            font-size: 3em;
+            margin: 10px 0;
+        }
+
+        .recipe-suggestion-card p {
+            color: #666;
+            font-size: 0.9em;
+            margin: 10px 0;
+        }
+
+        .add-to-collection-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-to-collection-btn:hover {
+            background-color: #1565c0;
+        }
+
+        .add-to-collection-btn:active {
+            transform: scale(0.98);
+        }
+
+        .section-title {
+            grid-column: 1 / -1;
+            font-size: 1.8em;
+            color: var(--accent);
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+        }
+
+        .search-new-recipes {
+            grid-column: 1 / -1;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .search-new-recipes input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .search-new-recipes input:focus {
+            outline: none;
+            box-shadow: 0 0 8px rgba(30, 136, 229, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .new-recipes-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar-nav">
+        <a class="nav-link" href="Untitled-1.html"><h3>Home</h3></a>
+        <a class="nav-link" href="My_recipies.html"><h3>My Recipes</h3></a>
+        <a class="nav-link" href="New_Recipes.html"><h3>New Recipes</h3></a>
+        <a class="nav-link" href="HTML_Favorites.html"><h3>Favorites</h3></a>
+        <a class="nav-link" href="Order_Foods.html"><h3>What We Order Today</h3></a>
+    </nav>
+
+    <div class="content-wrapper">
+        <!-- Header -->
+        <header class="main-header">
+            <h1>🌟 Discover New Recipes</h1>
+            <div class="header-right">
+                <div class="user-profile" id="user-profile-btn">
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="user-name">User</div>
+                        <div class="user-email" id="user-email">user@example.com</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="new-recipes-container">
+                <!-- Search Bar -->
+                <div class="search-new-recipes" style="grid-column: 1 / -1;">
+                    <input type="text" id="recipe-search" placeholder="🔍 Search recipe suggestions...">
+                </div>
+
+                <!-- Popular Recipes Section -->
+                <div class="section-title">Popular Recipes</div>
+                <div id="popular-recipes-container" class="recipe-list"></div>
+
+                <!-- Trending Recipes Section -->
+                <div class="section-title">Trending This Week</div>
+                <div id="trending-recipes-container" class="recipe-list"></div>
+
+                <!-- Seasonal Recipes Section -->
+                <div class="section-title">Seasonal Favorites</div>
+                <div id="seasonal-recipes-container" class="recipe-list"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Profile</h2>
+            <input type="text" id="profile-name" placeholder="Your name">
+            <input type="email" id="profile-email" placeholder="Your email">
+            <div class="modal-buttons">
+                <button id="save-profile" class="save-btn">Save</button>
+                <button id="close-profile" class="close-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userData = { name: 'User', email: 'user@example.com' };
+
+        // Suggested recipes library
+        const suggestedRecipes = [
+            // Popular Recipes
+            { name: 'Spaghetti Carbonara', emoji: '🍝', category: 'Pasta', difficulty: 'Easy', category_id: 'popular', ingredients: ['spaghetti', 'eggs', 'bacon', 'parmesan'] },
+            { name: 'Margherita Pizza', emoji: '🍕', category: 'Pizza', difficulty: 'Medium', category_id: 'popular', ingredients: ['flour', 'tomato', 'mozzarella', 'basil'] },
+            { name: 'Chicken Stir Fry', emoji: '🍗', category: 'Asian', difficulty: 'Easy', category_id: 'popular', ingredients: ['chicken', 'vegetables', 'soy sauce', 'garlic'] },
+            { name: 'Caesar Salad', emoji: '🥗', category: 'Salads', difficulty: 'Easy', category_id: 'popular', ingredients: ['lettuce', 'parmesan', 'croutons', 'caesar dressing'] },
+
+            // Trending Recipes
+            { name: 'Pad Thai', emoji: '🍲', category: 'Thai', difficulty: 'Medium', category_id: 'trending', ingredients: ['rice noodles', 'shrimp', 'eggs', 'peanuts'] },
+            { name: 'Tacos Al Pastor', emoji: '🌮', category: 'Mexican', difficulty: 'Medium', category_id: 'trending', ingredients: ['pork', 'pineapple', 'tortillas', 'onions'] },
+            { name: 'Sushi Rolls', emoji: '🍣', category: 'Japanese', difficulty: 'Hard', category_id: 'trending', ingredients: ['rice', 'nori', 'salmon', 'cucumber'] },
+            { name: 'Ramen Bowl', emoji: '🍜', category: 'Japanese', difficulty: 'Hard', category_id: 'trending', ingredients: ['noodles', 'broth', 'egg', 'toppings'] },
+
+            // Seasonal Recipes
+            { name: 'Pumpkin Soup', emoji: '🎃', category: 'Soups', difficulty: 'Easy', category_id: 'seasonal', ingredients: ['pumpkin', 'cream', 'onions', 'herbs'] },
+            { name: 'Roasted Vegetables', emoji: '🥘', category: 'Sides', difficulty: 'Easy', category_id: 'seasonal', ingredients: ['vegetables', 'olive oil', 'garlic', 'herbs'] },
+            { name: 'Homemade Pasta', emoji: '🍝', category: 'Pasta', difficulty: 'Hard', category_id: 'seasonal', ingredients: ['flour', 'eggs', 'salt', 'olive oil'] },
+            { name: 'Beef Stew', emoji: '🥩', category: 'Main Course', difficulty: 'Medium', category_id: 'seasonal', ingredients: ['beef', 'potatoes', 'carrots', 'broth'] }
+        ];
+
+        // Initialize page
+        function init() {
+            console.log('New Recipes page loaded');
+            loadUserProfile();
+            updateUserProfile();
+            setupEventListeners();
+            displayRecipeSuggestions();
+        }
+
+        function loadUserProfile() {
+            const stored = localStorage.getItem('userProfile');
+            if (stored) userData = JSON.parse(stored);
+        }
+
+        function saveUserProfile() {
+            localStorage.setItem('userProfile', JSON.stringify(userData));
+            updateUserProfile();
+        }
+
+        function updateUserProfile() {
+            document.getElementById('user-name').textContent = userData.name;
+            document.getElementById('user-email').textContent = userData.email;
+            const initials = (userData.name.split(' ')[0][0] + (userData.name.split(' ')[1]?.[0] || '')).toUpperCase();
+            document.getElementById('user-avatar').textContent = initials;
+        }
+
+        function setupEventListeners() {
+            // Profile modal
+            const userProfileBtn = document.getElementById('user-profile-btn');
+            if (userProfileBtn) {
+                userProfileBtn.addEventListener('click', () => {
+                    document.getElementById('profile-name').value = userData.name;
+                    document.getElementById('profile-email').value = userData.email;
+                    document.getElementById('profile-modal').classList.add('show');
+                });
+            }
+
+            const saveProfileBtn = document.getElementById('save-profile');
+            if (saveProfileBtn) {
+                saveProfileBtn.addEventListener('click', () => {
+                    userData.name = document.getElementById('profile-name').value || 'User';
+                    userData.email = document.getElementById('profile-email').value || 'user@example.com';
+                    saveUserProfile();
+                    document.getElementById('profile-modal').classList.remove('show');
+                });
+            }
+
+            const closeProfileBtn = document.getElementById('close-profile');
+            if (closeProfileBtn) {
+                closeProfileBtn.addEventListener('click', () => {
+                    document.getElementById('profile-modal').classList.remove('show');
+                });
+            }
+
+            const profileModal = document.getElementById('profile-modal');
+            if (profileModal) {
+                profileModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'profile-modal') {
+                        document.getElementById('profile-modal').classList.remove('show');
+                    }
+                });
+            }
+
+            // Search bar
+            const searchInput = document.getElementById('recipe-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    filterRecipeSuggestions(e.target.value);
+                });
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.getElementById('profile-modal').classList.remove('show');
+                }
+            });
+        }
+
+        function displayRecipeSuggestions() {
+            // Popular recipes
+            const popularContainer = document.getElementById('popular-recipes-container');
+            const popularRecipes = suggestedRecipes.filter(r => r.category_id === 'popular');
+            displayRecipes(popularRecipes, popularContainer);
+
+            // Trending recipes
+            const trendingContainer = document.getElementById('trending-recipes-container');
+            const trendingRecipes = suggestedRecipes.filter(r => r.category_id === 'trending');
+            displayRecipes(trendingRecipes, trendingContainer);
+
+            // Seasonal recipes
+            const seasonalContainer = document.getElementById('seasonal-recipes-container');
+            const seasonalRecipes = suggestedRecipes.filter(r => r.category_id === 'seasonal');
+            displayRecipes(seasonalRecipes, seasonalContainer);
+        }
+
+        function displayRecipes(recipes, container) {
+            container.innerHTML = '';
+            recipes.forEach(recipe => {
+                const card = document.createElement('div');
+                card.className = 'recipe-suggestion-card';
+                card.innerHTML = `
+                    <div class="emoji">${recipe.emoji}</div>
+                    <h3>${recipe.name}</h3>
+                    <p><strong>Category:</strong> ${recipe.category}</p>
+                    <p><strong>Difficulty:</strong> ${recipe.difficulty}</p>
+                    <p><strong>Ingredients:</strong> ${recipe.ingredients.join(', ')}</p>
+                    <button class="add-to-collection-btn" onclick="addRecipeToCollection('${recipe.name}', '${recipe.emoji}', '${recipe.category}', '${recipe.ingredients.join(',')}')">
+                        + Add to My Recipes
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterRecipeSuggestions(query) {
+            const filtered = suggestedRecipes.filter(r => 
+                r.name.toLowerCase().includes(query.toLowerCase()) ||
+                r.category.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                const container = document.querySelector('.new-recipes-container');
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #999;">No recipes found matching your search.</div>';
+                return;
+            }
+
+            // Clear and rebuild
+            const container = document.querySelector('.new-recipes-container');
+            container.innerHTML = `
+                <div class="search-new-recipes" style="grid-column: 1 / -1;">
+                    <input type="text" id="recipe-search" placeholder="🔍 Search recipe suggestions...">
+                </div>
+                <div class="section-title">Search Results</div>
+                <div id="search-results" style="grid-column: 1 / -1;"></div>
+            `;
+
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.style.display = 'grid';
+            resultsContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(250px, 1fr))';
+            resultsContainer.style.gap = '20px';
+
+            displayRecipes(filtered, resultsContainer);
+
+            // Re-attach search listener
+            const searchInput = document.getElementById('recipe-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    filterRecipeSuggestions(e.target.value);
+                });
+            }
+        }
+
+        function addRecipeToCollection(name, emoji, category, ingredients) {
+            // Get existing recipes
+            let userRecipes = JSON.parse(localStorage.getItem('userRecipes') || '{}');
+
+            // Generate ID
+            const id = 'recipe_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+            // Create recipe object
+            const newRecipe = {
+                id: id,
+                name: name,
+                image: emoji,
+                category: category,
+                ingredients: ingredients.split(',').map(i => i.trim()),
+                rating: 0,
+                tags: [],
+                createdAt: new Date().toISOString()
+            };
+
+            // Ensure category exists
+            if (!userRecipes[category]) {
+                userRecipes[category] = [];
+            }
+
+            // Add recipe
+            userRecipes[category].push(newRecipe);
+            localStorage.setItem('userRecipes', JSON.stringify(userRecipes));
+
+            // Show confirmation
+            alert(`✅ "${name}" has been added to your My Recipes!`);
+        }
+
+        // Start
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Recipes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="CSS-Foodpicker.css">
+    <style>
+        /* Category Menu */
+        .category-nav {
+            width: 200px;
+            background: #f5f5f5;
+            padding: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .category-btn {
+            text-decoration: none;
+            color: #666;
+            padding: 1rem 1.5rem;
+            transition: all 200ms ease;
+            border-left: 4px solid transparent;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+        }
+
+        .category-btn:hover {
+            color: var(--accent);
+            background: rgba(30, 136, 229, 0.05);
+            border-left-color: var(--accent);
+        }
+
+        .category-btn.active {
+            color: var(--accent);
+            background: rgba(30, 136, 229, 0.1);
+            border-left-color: var(--accent);
+        }
+
+        .add-category-btn {
+            margin: 1rem 1.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 200ms ease;
+        }
+
+        .add-category-btn:hover {
+            background: #1565c0;
+        }
+
+        /* Category with Edit/Delete Controls */
+        .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem;
+            transition: all 200ms ease;
+        }
+
+        .category-item .category-btn {
+            flex: 1;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+
+        .category-controls {
+            display: flex;
+            gap: 0.25rem;
+            opacity: 0;
+            transition: opacity 200ms ease;
+        }
+
+        .category-item:hover .category-controls {
+            opacity: 1;
+        }
+
+        .category-edit-btn, .category-delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.9rem;
+            color: #999;
+            transition: color 200ms ease;
+        }
+
+        .category-edit-btn:hover {
+            color: var(--accent);
+        }
+
+        .category-delete-btn:hover {
+            color: #e53935;
+        }
+
+        /* Header with User Profile and Search */
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            background: white;
+        }
+
+        .header-left h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: var(--accent);
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 200ms ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            background: #f5f5f5;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 200ms ease;
+        }
+
+        .user-profile:hover {
+            background: #e8e8e8;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        /* Recipe Grid */
+        .recipes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+        }
+
+        @media (max-width: 768px) {
+            .recipes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .recipe-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 200ms ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+        }
+
+        .recipe-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .recipe-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            overflow: hidden;
+        }
+
+        .recipe-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .recipe-content {
+            padding: 1.5rem;
+        }
+
+        .recipe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .recipe-card h3 {
+            margin: 0;
+            color: var(--accent);
+            font-size: 1.3rem;
+            flex: 1;
+        }
+
+        .recipe-rating {
+            display: flex;
+            gap: 0.2rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .star {
+            color: #ddd;
+            transition: color 200ms ease;
+        }
+
+        .star.filled {
+            color: #ffc107;
+        }
+
+        .star:hover {
+            color: #ffc107;
+        }
+
+        .recipe-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .recipe-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .recipe-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(30, 136, 229, 0.1);
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .recipe-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .recipe-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 200ms ease;
+        }
+
+        .recipe-btn:hover {
+            background: #f5f5f5;
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Add Recipe Button */
+        .add-recipe-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+            transition: all 200ms ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .add-recipe-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(30, 136, 229, 0.4);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .image-preview {
+            width: 150px;
+            height: 150px;
+            border: 2px dashed #ddd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9f9f9;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-preview.empty {
+            color: #999;
+            font-size: 2rem;
+        }
+
+        .tags-input {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .tag-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(30, 136, 229, 0.1);
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .tag-item button {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-save {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            background: var(--accent);
+            color: white;
+            transition: all 200ms ease;
+        }
+
+        .btn-save:hover {
+            background: #1565c0;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background: #f0f0f0;
+            color: #333;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 200ms ease;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+
+        .btn-share {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-share:hover {
+            background: #388e3c;
+        }
+
+        /* Recipe Detail View */
+        .recipe-detail {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .recipe-detail.show {
+            display: block;
+        }
+
+        .detail-header {
+            position: relative;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 5rem;
+        }
+
+        .detail-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .detail-close {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 200ms ease;
+        }
+
+        .detail-close:hover {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .detail-content {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .detail-title {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .detail-meta {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+
+        .detail-section h3 {
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .detail-section ul, .detail-section ol {
+            line-height: 2;
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #999;
+        }
+
+        .empty-state h3 {
+            font-size: 1.3rem;
+            margin: 0 0 1rem 0;
+        }
+
+        /* User Profile Modal */
+        .profile-modal {
+            display: none;
+        }
+
+        .profile-modal.show {
+            display: block;
+        }
+
+        .profile-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sso-button {
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 200ms ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .sso-button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .google-btn {
+            border-color: #4285f4;
+            color: #4285f4;
+        }
+
+        .google-btn:hover {
+            background: rgba(66, 133, 244, 0.05);
+        }
+
+        /* Share Modal */
+        .share-content {
+            text-align: center;
+        }
+
+        .share-link-box {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .share-link-box input {
+            flex: 1;
+            border: none;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .btn-copy {
+            padding: 0.5rem 1rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-copy:hover {
+            background: #1565c0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="category-nav">
+        <a class="nav-link" href="Untitled-1.html" style="margin-bottom: 1rem;">← Back to Home</a>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 1.5rem; margin-bottom: 1rem;">
+            <h3 style="color: #999; margin: 0; font-size: 0.9rem; text-transform: uppercase;">Categories</h3>
+            <button class="add-category-btn" id="add-category-btn" style="margin: 0; padding: 0.4rem 0.6rem; font-size: 0.9rem;">+</button>
+        </div>
+        <button class="category-btn active" data-category="all">📋 All Recipes</button>
+        <button class="category-btn" data-category="breakfast">🍳 Breakfast</button>
+        <button class="category-btn" data-category="lunch">🥗 Lunch</button>
+        <button class="category-btn" data-category="dinner">🍽️ Dinner</button>
+        <button class="category-btn" data-category="baking">🍰 Baking</button>
+        <div id="custom-categories" style="margin-top: 1rem;"></div>
+    </nav>
+
+    <div class="content-wrapper">
+        <!-- Header with Search and User Profile -->
+        <div class="header-top">
+            <div class="header-left">
+                <h1>My Recipes</h1>
+            </div>
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="🔍 Search recipes...">
+            </div>
+            <div class="header-right">
+                <div class="user-profile" id="user-profile-btn">
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="user-name">User</div>
+                        <div class="user-email" id="user-email">user@example.com</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <main class="main" style="padding: 0;">
+            <div id="recipes-container" class="recipes-grid"></div>
+        </main>
+    </div>
+
+    <!-- Add Recipe Button -->
+    <button class="add-recipe-btn" id="add-recipe-btn">+</button>
+
+    <!-- Add/Edit Recipe Modal -->
+    <div id="recipe-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Add New Recipe</h2>
+            <form id="recipe-form">
+                <div class="form-group">
+                    <label for="recipe-name">Recipe Name *</label>
+                    <input type="text" id="recipe-name" required placeholder="e.g., Chocolate Chip Cookies">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="recipe-category">Category *</label>
+                        <select id="recipe-category" required>
+                            <option value="">Select a category</option>
+                            <option value="breakfast">🍳 Breakfast</option>
+                            <option value="lunch">🥗 Lunch</option>
+                            <option value="dinner">🍽️ Dinner</option>
+                            <option value="baking">🍰 Baking</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipe-time">Prep Time (minutes)</label>
+                        <input type="number" id="recipe-time" placeholder="30" min="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="recipe-image">Recipe Image (URL)</label>
+                    <input type="text" id="recipe-image" placeholder="https://example.com/image.jpg">
+                    <div id="image-preview" class="image-preview empty">🖼️</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Tags (press Enter to add)</label>
+                    <input type="text" id="recipe-tag-input" placeholder="e.g., vegetarian, quick, easy">
+                    <div id="recipe-tags" class="tags-input" style="margin-top: 0.5rem;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="recipe-ingredients">Ingredients *</label>
+                    <textarea id="recipe-ingredients" required placeholder="List ingredients (one per line)&#10;- Flour&#10;- Eggs&#10;- Sugar"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="recipe-instructions">Instructions *</label>
+                    <textarea id="recipe-instructions" required placeholder="Step-by-step instructions..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-save">Save Recipe</button>
+                    <button type="button" class="btn-cancel" id="close-modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div id="category-modal" class="modal">
+        <div class="modal-content">
+            <h2>Create New Category</h2>
+            <form id="category-form">
+                <div class="form-group">
+                    <label for="category-name">Category Name *</label>
+                    <input type="text" id="category-name" required placeholder="e.g., Desserts, Soups">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-save">Create Category</button>
+                    <button type="button" class="btn-cancel" id="close-category-modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recipe Detail View -->
+    <div id="recipe-detail" class="recipe-detail">
+        <button class="detail-close" id="detail-close">✕</button>
+        <div id="detail-image" class="detail-header">🍳</div>
+        <div class="detail-content">
+            <h1 class="detail-title" id="detail-name">Recipe Name</h1>
+            
+            <div class="detail-meta">
+                <div>
+                    <strong>⏱️ Prep Time:</strong>
+                    <span id="detail-time">-</span> mins
+                </div>
+                <div>
+                    <strong>📂 Category:</strong>
+                    <span id="detail-category">-</span>
+                </div>
+                <div>
+                    <strong>⭐ Rating:</strong>
+                    <span id="detail-rating">Not rated</span>
+                </div>
+            </div>
+
+            <div id="detail-tags-container" style="margin-bottom: 2rem;"></div>
+
+            <div class="detail-section">
+                <h3>Ingredients</h3>
+                <ul id="detail-ingredients"></ul>
+            </div>
+
+            <div class="detail-section">
+                <h3>Instructions</h3>
+                <ol id="detail-instructions"></ol>
+            </div>
+
+            <div class="detail-actions">
+                <button class="recipe-btn" id="detail-edit">✏️ Edit</button>
+                <button class="recipe-btn btn-share" id="detail-share">📤 Share Recipe</button>
+                <button class="recipe-btn btn-danger" id="detail-delete">🗑️ Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Profile Modal -->
+    <div id="profile-modal" class="modal profile-modal">
+        <div class="modal-content">
+            <h2>User Profile</h2>
+            <div class="profile-form">
+                <div class="form-group">
+                    <label for="profile-name">Name</label>
+                    <input type="text" id="profile-name" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label for="profile-email">Email</label>
+                    <input type="email" id="profile-email" placeholder="your@email.com">
+                </div>
+
+                <h3 style="margin-top: 1.5rem; color: var(--accent);">Sign In Options</h3>
+                <button type="button" class="sso-button google-btn" id="google-sso">
+                    🔵 Sign in with Google (Coming Soon)
+                </button>
+                <p style="font-size: 0.85rem; color: #999; text-align: center; margin-top: 1rem;">
+                    ℹ️ Google SSO integration requires backend setup. For now, your profile is stored locally.
+                </p>
+
+                <div class="form-actions" style="margin-top: 2rem;">
+                    <button type="button" class="btn-save" id="save-profile">Save Profile</button>
+                    <button type="button" class="btn-cancel" id="close-profile">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Recipe Modal -->
+    <div id="share-modal" class="modal">
+        <div class="modal-content">
+            <h2>Share Recipe</h2>
+            <div class="share-content">
+                <p>Share this recipe with friends who have Food-Picker installed:</p>
+                
+                <div class="share-link-box">
+                    <input type="text" id="share-link" readonly>
+                    <button type="button" class="btn-copy" onclick="copyShareLink()">Copy Link</button>
+                </div>
+
+                <p style="font-size: 0.9rem; color: #666; margin-top: 1.5rem;">
+                    <strong>Or share this code:</strong>
+                </p>
+                <div class="share-link-box">
+                    <input type="text" id="share-code" readonly style="cursor: pointer;">
+                    <button type="button" class="btn-copy" onclick="copyShareCode()">Copy Code</button>
+                </div>
+
+                <p style="font-size: 0.85rem; color: #999; margin-top: 1.5rem;">
+                    💡 Friends can paste the code on their My Recipes page to import this recipe.
+                </p>
+
+                <button type="button" class="btn-cancel" id="close-share" style="width: 100%; margin-top: 1rem;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample recipes data
+        const sampleRecipes = {
+            breakfast: [
+                {id: 1, name: "Pancakes", category: "breakfast", ingredients: "- 2 cups flour\n- 2 eggs\n- 1 cup milk\n- 2 tsp baking powder\n- Salt & sugar", instructions: "Mix dry ingredients. Combine eggs, milk, and butter. Mix together. Cook on griddle until golden.", prepTime: 20, image: null, tags: ["quick", "breakfast"], rating: 0},
+                {id: 2, name: "Scrambled Eggs", category: "breakfast", ingredients: "- 3 eggs\n- 1 tbsp butter\n- Salt & pepper", instructions: "Beat eggs. Melt butter in pan. Add eggs and stir until cooked.", prepTime: 5, image: null, tags: ["quick", "easy"], rating: 0}
+            ],
+            lunch: [
+                {id: 3, name: "Caesar Salad", category: "lunch", ingredients: "- Romaine lettuce\n- Parmesan cheese\n- Croutons\n- Caesar dressing", instructions: "Chop lettuce, toss with dressing, add croutons and parmesan.", prepTime: 10, image: null, tags: ["vegetarian", "healthy"], rating: 0}
+            ],
+            dinner: [
+                {id: 4, name: "Spaghetti Bolognese", category: "dinner", ingredients: "- 400g spaghetti\n- 500g ground beef\n- Tomato sauce\n- Onion & garlic", instructions: "Brown beef with onion. Add tomato sauce. Simmer 20 mins. Serve with pasta.", prepTime: 30, image: null, tags: ["comfort-food"], rating: 0}
+            ],
+            baking: [
+                {id: 5, name: "Chocolate Chip Cookies", category: "baking", ingredients: "- 2 cups flour\n- 1 cup butter\n- 1 cup brown sugar\n- 2 cups chocolate chips", instructions: "Cream butter and sugar. Add eggs and vanilla. Mix in flour. Fold in chips. Bake at 375°F for 9-11 mins.", prepTime: 45, image: null, tags: ["dessert", "sweet"], rating: 0}
+            ]
+        };
+
+        let currentCategory = 'all';
+        let recipes = {};
+        let currentRecipeBeingEdited = null;
+        let tagBuffer = [];
+        let userData = { name: 'User', email: 'user@example.com' };
+
+        function init() {
+            loadUserProfile();
+            loadRecipes();
+            renderRecipes();
+            setupEventListeners();
+            updateUserProfile();
+            
+            // Check if we need to open a specific recipe (from Randomise button)
+            const recipeToOpen = localStorage.getItem('recipeToOpen');
+            if (recipeToOpen) {
+                setTimeout(() => {
+                    openRecipeDetail(parseInt(recipeToOpen));
+                    localStorage.removeItem('recipeToOpen');
+                }, 300);
+            }
+        }
+
+        function loadUserProfile() {
+            const stored = localStorage.getItem('userProfile');
+            if (stored) userData = JSON.parse(stored);
+        }
+
+        function saveUserProfile() {
+            localStorage.setItem('userProfile', JSON.stringify(userData));
+            updateUserProfile();
+        }
+
+        function updateUserProfile() {
+            document.getElementById('user-name').textContent = userData.name;
+            document.getElementById('user-email').textContent = userData.email;
+            const initials = (userData.name.split(' ')[0][0] + (userData.name.split(' ')[1]?.[0] || '')).toUpperCase();
+            document.getElementById('user-avatar').textContent = initials;
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentCategory = e.target.dataset.category;
+                    document.getElementById('search-input').value = '';
+                    renderRecipes();
+                });
+            });
+
+            document.getElementById('add-recipe-btn').addEventListener('click', () => {
+                currentRecipeBeingEdited = null;
+                document.getElementById('modal-title').textContent = 'Add New Recipe';
+                document.getElementById('recipe-form').reset();
+                tagBuffer = [];
+                document.getElementById('recipe-tags').innerHTML = '';
+                document.getElementById('recipe-modal').classList.add('show');
+            });
+
+            document.getElementById('close-modal').addEventListener('click', () => {
+                document.getElementById('recipe-modal').classList.remove('show');
+            });
+
+            document.getElementById('recipe-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveRecipe();
+            });
+
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                if (query.trim()) {
+                    // Global search across all recipes
+                    const allRecipes = [];
+                    Object.values(recipes).forEach(catRecipes => {
+                        if (Array.isArray(catRecipes)) {
+                            allRecipes.push(...catRecipes);
+                        }
+                    });
+                    
+                    const results = allRecipes.filter(r =>
+                        r.name?.toLowerCase().includes(query) ||
+                        r.tags?.some(t => t.toLowerCase().includes(query))
+                    );
+                    
+                    // Show results from all categories
+                    currentCategory = null;
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    renderRecipesFromList(results);
+                } else {
+                    // Reset to all recipes view
+                    currentCategory = 'all';
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelector('[data-category="all"]')?.classList.add('active');
+                    renderRecipes();
+                }
+            });
+
+            document.getElementById('add-category-btn').addEventListener('click', () => {
+                document.getElementById('category-form').reset();
+                delete document.getElementById('category-form').dataset.editingId;
+                document.getElementById('category-form').dataset.isEdit = 'false';
+                document.querySelector('#category-modal h2').textContent = 'Create New Category';
+                document.querySelector('#category-modal button[type="submit"]').textContent = 'Create Category';
+                document.getElementById('category-modal').classList.add('show');
+            });
+
+            document.getElementById('close-category-modal').addEventListener('click', () => {
+                document.getElementById('category-modal').classList.remove('show');
+                document.getElementById('category-form').reset();
+                delete document.getElementById('category-form').dataset.editingId;
+            });
+
+            document.getElementById('category-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                addCategory();
+            });
+
+            document.getElementById('recipe-tag-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const tag = e.target.value.trim();
+                    if (tag) {
+                        tagBuffer.push(tag);
+                        renderTags();
+                        e.target.value = '';
+                    }
+                }
+            });
+
+            document.getElementById('recipe-image').addEventListener('change', (e) => {
+                const url = e.target.value;
+                const preview = document.getElementById('image-preview');
+                if (url) {
+                    preview.classList.remove('empty');
+                    preview.innerHTML = `<img src="${url}" onerror="this.parentElement.classList.add('empty'); this.parentElement.innerHTML='❌ Error'">`;
+                }
+            });
+
+            document.getElementById('user-profile-btn').addEventListener('click', () => {
+                document.getElementById('profile-name').value = userData.name;
+                document.getElementById('profile-email').value = userData.email;
+                document.getElementById('profile-modal').classList.add('show');
+            });
+
+            document.getElementById('save-profile').addEventListener('click', () => {
+                userData.name = document.getElementById('profile-name').value || 'User';
+                userData.email = document.getElementById('profile-email').value || 'user@example.com';
+                saveUserProfile();
+                document.getElementById('profile-modal').classList.remove('show');
+            });
+
+            document.getElementById('close-profile').addEventListener('click', () => {
+                document.getElementById('profile-modal').classList.remove('show');
+            });
+
+            document.getElementById('detail-close').addEventListener('click', () => {
+                document.getElementById('recipe-detail').classList.remove('show');
+            });
+
+            document.getElementById('close-share').addEventListener('click', () => {
+                document.getElementById('share-modal').classList.remove('show');
+            });
+
+            [document.getElementById('recipe-modal'), document.getElementById('category-modal'), document.getElementById('profile-modal'), document.getElementById('share-modal')].forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) modal.classList.remove('show');
+                });
+            });
+
+            document.getElementById('google-sso').addEventListener('click', () => {
+                alert('Google SSO integration requires backend setup.\n\nFor MVP, edit your profile manually above.');
+            });
+        }
+
+        function renderTags() {
+            const container = document.getElementById('recipe-tags');
+            container.innerHTML = tagBuffer.map((tag, idx) => `<div class="tag-item">${tag}<button type="button" onclick="removeTag(${idx})">×</button></div>`).join('');
+        }
+
+        function removeTag(idx) {
+            tagBuffer.splice(idx, 1);
+            renderTags();
+        }
+
+        function loadRecipes() {
+            const stored = localStorage.getItem('userRecipes');
+            recipes = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(sampleRecipes));
+            saveRecipes();
+
+            const customCats = localStorage.getItem('customCategories');
+            if (customCats) JSON.parse(customCats).forEach(cat => {
+                if (!recipes[cat.id]) recipes[cat.id] = [];
+                renderCategoryButton(cat);
+            });
+            
+            // Populate category dropdown
+            populateCategoryDropdown();
+        }
+
+        function populateCategoryDropdown() {
+            const select = document.getElementById('recipe-category');
+            if (!select) return;
+            
+            // Keep the default option
+            const defaultOption = select.innerHTML.split('\n')[1];
+            select.innerHTML = defaultOption;
+            
+            // Add predefined categories
+            const predefined = [
+                { id: 'breakfast', name: '🍳 Breakfast' },
+                { id: 'lunch', name: '🥗 Lunch' },
+                { id: 'dinner', name: '🍽️ Dinner' },
+                { id: 'baking', name: '🍰 Baking' }
+            ];
+            
+            predefined.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.id;
+                opt.textContent = cat.name;
+                select.appendChild(opt);
+            });
+            
+            // Add custom categories
+            const customCats = localStorage.getItem('customCategories');
+            if (customCats) {
+                JSON.parse(customCats).forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.id;
+                    opt.textContent = (cat.emoji || '📁') + ' ' + cat.name;
+                    select.appendChild(opt);
+                });
+            }
+        }
+
+        function renderCategoryButton(category) {
+            const container = document.createElement('div');
+            container.className = 'category-item';
+            container.dataset.categoryId = category.id;
+            
+            const btn = document.createElement('button');
+            btn.className = 'category-btn';
+            btn.dataset.category = category.id;
+            btn.textContent = (category.emoji || '📁') + ' ' + category.name;
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = category.id;
+                renderRecipes();
+            });
+            
+            const controls = document.createElement('div');
+            controls.className = 'category-controls';
+            
+            const editBtn = document.createElement('button');
+            editBtn.className = 'category-edit-btn';
+            editBtn.textContent = '✏️';
+            editBtn.title = 'Edit category';
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                editCategory(category);
+            });
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'category-delete-btn';
+            deleteBtn.textContent = '✕';
+            deleteBtn.title = 'Delete category';
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteCategory(category);
+            });
+            
+            controls.appendChild(editBtn);
+            controls.appendChild(deleteBtn);
+            
+            container.appendChild(btn);
+            container.appendChild(controls);
+            
+            document.getElementById('custom-categories').appendChild(container);
+        }
+
+        function addCategory() {
+            const name = document.getElementById('category-name').value;
+            const editingId = document.getElementById('category-form').dataset.editingId;
+            
+            if (editingId) {
+                // Update existing category
+                const customCats = JSON.parse(localStorage.getItem('customCategories')) || [];
+                const catIndex = customCats.findIndex(c => c.id === editingId);
+                if (catIndex >= 0) {
+                    customCats[catIndex].name = name;
+                    localStorage.setItem('customCategories', JSON.stringify(customCats));
+                }
+                
+                // Update category button
+                const categoryItem = document.querySelector(`[data-category-id="${editingId}"]`);
+                if (categoryItem) {
+                    const btn = categoryItem.querySelector('.category-btn');
+                    btn.textContent = '📁 ' + name;
+                }
+                
+                delete document.getElementById('category-form').dataset.editingId;
+                document.getElementById('category-form').dataset.isEdit = 'false';
+            } else {
+                // Add new category
+                const id = 'cat_' + Date.now();
+                const category = { id, name, emoji: '📁' };  // Default emoji
+                recipes[id] = [];
+
+                let customCats = localStorage.getItem('customCategories');
+                customCats = customCats ? JSON.parse(customCats) : [];
+                customCats.push(category);
+                localStorage.setItem('customCategories', JSON.stringify(customCats));
+
+                renderCategoryButton(category);
+            }
+            
+            populateCategoryDropdown();  // Update dropdown with new category
+            saveRecipes();
+            document.getElementById('category-modal').classList.remove('show');
+            document.getElementById('category-form').reset();
+            document.querySelector('#category-modal h2').textContent = 'Create New Category';
+            document.querySelector('#category-modal button[type="submit"]').textContent = 'Create Category';
+        }
+
+        function editCategory(category) {
+            document.getElementById('category-name').value = category.name;
+            document.getElementById('category-form').dataset.editingId = category.id;
+            document.getElementById('category-form').dataset.isEdit = 'true';
+            document.querySelector('#category-modal h2').textContent = 'Edit Category';
+            document.querySelector('#category-modal button[type="submit"]').textContent = 'Save Changes';
+            document.getElementById('category-modal').classList.add('show');
+        }
+
+        function deleteCategory(category) {
+            if (confirm(`Delete category "${category.name}"? Recipes in this category will be moved to "All Recipes".`)) {
+                // Delete from custom categories
+                let customCats = JSON.parse(localStorage.getItem('customCategories')) || [];
+                customCats = customCats.filter(c => c.id !== category.id);
+                localStorage.setItem('customCategories', JSON.stringify(customCats));
+                
+                // Delete from recipes
+                if (recipes[category.id]) {
+                    delete recipes[category.id];
+                }
+                
+                // Remove from UI
+                const categoryItem = document.querySelector(`[data-category-id="${category.id}"]`);
+                if (categoryItem) categoryItem.remove();
+                
+                // Reset to all recipes view
+                currentCategory = 'all';
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector('[data-category="all"]').classList.add('active');
+                
+                saveRecipes();
+                populateCategoryDropdown();
+                renderRecipes();
+            }
+        }
+
+        function renderRecipes(searchTerm = '') {
+            const container = document.getElementById('recipes-container');
+            let recipesToShow = [];
+
+            if (searchTerm) {
+                Object.values(recipes).forEach(catRecipes => {
+                    if (Array.isArray(catRecipes)) {
+                        recipesToShow.push(...catRecipes.filter(r => 
+                            r.name.toLowerCase().includes(searchTerm) ||
+                            r.tags?.some(t => t.toLowerCase().includes(searchTerm))
+                        ));
+                    }
+                });
+            } else if (currentCategory === 'all') {
+                Object.values(recipes).forEach(catRecipes => {
+                    if (Array.isArray(catRecipes)) recipesToShow.push(...catRecipes);
+                });
+            } else if (currentCategory && recipes[currentCategory]) {
+                recipesToShow = recipes[currentCategory] || [];
+            }
+
+            if (recipesToShow.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No recipes found</h3><p>Add your first recipe using the + button!</p></div>';
+                return;
+            }
+
+            container.innerHTML = recipesToShow.map(recipe => `
+                <div class="recipe-card" onclick="openRecipeDetail(${recipe.id})">
+                    <div class="recipe-image">${recipe.image ? `<img src="${recipe.image}">` : '🍳'}</div>
+                    <div class="recipe-content">
+                        <div class="recipe-header">
+                            <h3>${recipe.name}</h3>
+                            <div class="recipe-rating" onclick="event.stopPropagation(); rateRecipe(${recipe.id}, event)">${renderStars(recipe.rating)}</div>
+                        </div>
+                        <div class="recipe-meta">
+                            ${recipe.prepTime ? `<span>⏱️ ${recipe.prepTime} min</span>` : ''}<span>📂 ${recipe.category}</span>
+                        </div>
+                        ${recipe.tags && recipe.tags.length > 0 ? `<div class="recipe-tags">${recipe.tags.slice(0, 3).map(tag => `<span class="recipe-tag">${tag}</span>`).join('')}${recipe.tags.length > 3 ? `<span class="recipe-tag">+${recipe.tags.length - 3}</span>` : ''}</div>` : ''}
+                        <div class="recipe-actions" onclick="event.stopPropagation();">
+                            <button class="recipe-btn favorite-btn" data-id="${recipe.id}" title="Add to favorites">${isFavoritedFlag(recipe.id) ? '❤️' : '🤍'} Favorite</button>
+                            <button class="recipe-btn" onclick="editRecipe(${recipe.id})">✏️ Edit</button>
+                            <button class="recipe-btn btn-share" onclick="shareRecipe(${recipe.id})">📤 Share</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add event listeners to favorite buttons
+            document.querySelectorAll('.favorite-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const recipeId = parseInt(btn.dataset.id);
+                    toggleFavorite(recipeId);
+                });
+            });
+        }
+
+        function renderRecipesFromList(recipesList) {
+            const container = document.getElementById('recipes-container');
+            
+            if (recipesList.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No recipes found</h3><p>Try a different search term</p></div>';
+                return;
+            }
+
+            container.innerHTML = recipesList.map(recipe => `
+                <div class="recipe-card" onclick="openRecipeDetail(${recipe.id})">
+                    <div class="recipe-image">${recipe.image ? `<img src="${recipe.image}">` : '🍳'}</div>
+                    <div class="recipe-content">
+                        <div class="recipe-header">
+                            <h3>${recipe.name}</h3>
+                            <div class="recipe-rating" onclick="event.stopPropagation(); rateRecipe(${recipe.id}, event)">${renderStars(recipe.rating)}</div>
+                        </div>
+                        <div class="recipe-meta">
+                            ${recipe.prepTime ? `<span>⏱️ ${recipe.prepTime} min</span>` : ''}<span>📂 ${recipe.category}</span>
+                        </div>
+                        ${recipe.tags && recipe.tags.length > 0 ? `<div class="recipe-tags">${recipe.tags.slice(0, 3).map(tag => `<span class="recipe-tag">${tag}</span>`).join('')}${recipe.tags.length > 3 ? `<span class="recipe-tag">+${recipe.tags.length - 3}</span>` : ''}</div>` : ''}
+                        <div class="recipe-actions" onclick="event.stopPropagation();">
+                            <button class="recipe-btn favorite-btn" data-id="${recipe.id}" title="Add to favorites">${isFavoritedFlag(recipe.id) ? '❤️' : '🤍'} Favorite</button>
+                            <button class="recipe-btn" onclick="editRecipe(${recipe.id})">✏️ Edit</button>
+                            <button class="recipe-btn btn-share" onclick="shareRecipe(${recipe.id})">📤 Share</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add event listeners to favorite buttons
+            document.querySelectorAll('.favorite-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const recipeId = parseInt(btn.dataset.id);
+                    toggleFavorite(recipeId);
+                });
+            });
+        }
+
+        function renderStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) stars += `<span class="star ${i <= rating ? 'filled' : ''}">★</span>`;
+            return stars;
+        }
+
+        function rateRecipe(id, event) {
+            const stars = event.currentTarget.querySelectorAll('.star');
+            stars.forEach((star, idx) => {
+                star.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const allRecipes = Object.values(recipes).flat();
+                    const recipe = allRecipes.find(r => r.id === id);
+                    if (recipe) {
+                        recipe.rating = idx + 1;
+                        saveRecipes();
+                        renderRecipes();
+                    }
+                });
+                star.addEventListener('mouseover', () => {
+                    stars.forEach((s, sidx) => s.classList.toggle('filled', sidx <= idx));
+                });
+            });
+        }
+
+        function openRecipeDetail(id) {
+            const allRecipes = Object.values(recipes).flat();
+            const recipe = allRecipes.find(r => r.id === id);
+            if (!recipe) return;
+
+            document.getElementById('detail-name').textContent = recipe.name;
+            document.getElementById('detail-time').textContent = recipe.prepTime || '—';
+            document.getElementById('detail-category').textContent = recipe.category;
+            document.getElementById('detail-rating').textContent = recipe.rating > 0 ? '★'.repeat(recipe.rating) + ` (${recipe.rating}/5)` : 'Not rated';
+
+            const detailImage = document.getElementById('detail-image');
+            detailImage.innerHTML = recipe.image ? `<img src="${recipe.image}">` : '🍳';
+
+            const tagsContainer = document.getElementById('detail-tags-container');
+            tagsContainer.innerHTML = recipe.tags && recipe.tags.length > 0 ? `<div class="recipe-tags">${recipe.tags.map(tag => `<span class="recipe-tag">${tag}</span>`).join('')}</div>` : '';
+
+            document.getElementById('detail-ingredients').innerHTML = recipe.ingredients.split('\n').map(ing => `<li>${ing}</li>`).join('');
+            document.getElementById('detail-instructions').innerHTML = recipe.instructions.split('. ').map((inst, idx) => `<li>${inst.trim()}${idx < recipe.instructions.split('. ').length - 1 ? '.' : ''}</li>`).join('');
+
+            document.getElementById('detail-edit').onclick = () => editRecipe(id);
+            document.getElementById('detail-share').onclick = () => shareRecipe(id);
+            document.getElementById('detail-delete').onclick = () => {
+                document.getElementById('recipe-detail').classList.remove('show');
+                deleteRecipe(id);
+            };
+
+            document.getElementById('recipe-detail').classList.add('show');
+        }
+
+        function editRecipe(id) {
+            const allRecipes = Object.values(recipes).flat();
+            const recipe = allRecipes.find(r => r.id === id);
+            if (!recipe) return;
+
+            currentRecipeBeingEdited = id;
+            document.getElementById('modal-title').textContent = 'Edit Recipe';
+            document.getElementById('recipe-name').value = recipe.name;
+            document.getElementById('recipe-category').value = recipe.category;
+            document.getElementById('recipe-time').value = recipe.prepTime || '';
+            document.getElementById('recipe-image').value = recipe.image || '';
+            document.getElementById('recipe-ingredients').value = recipe.ingredients;
+            document.getElementById('recipe-instructions').value = recipe.instructions;
+
+            tagBuffer = [...(recipe.tags || [])];
+            renderTags();
+
+            if (recipe.image) {
+                const preview = document.getElementById('image-preview');
+                preview.classList.remove('empty');
+                preview.innerHTML = `<img src="${recipe.image}">`;
+            }
+
+            document.getElementById('recipe-detail').classList.remove('show');
+            document.getElementById('recipe-modal').classList.add('show');
+        }
+
+        function saveRecipe() {
+            const name = document.getElementById('recipe-name').value;
+            const category = document.getElementById('recipe-category').value;
+            const ingredients = document.getElementById('recipe-ingredients').value;
+            const instructions = document.getElementById('recipe-instructions').value;
+            const prepTime = document.getElementById('recipe-time').value;
+            const image = document.getElementById('recipe-image').value;
+
+            if (!recipes[category]) recipes[category] = [];
+
+            if (currentRecipeBeingEdited) {
+                const allRecipes = Object.values(recipes).flat();
+                const recipe = allRecipes.find(r => r.id === currentRecipeBeingEdited);
+                if (recipe) {
+                    recipe.name = name;
+                    recipe.category = category;
+                    recipe.ingredients = ingredients;
+                    recipe.instructions = instructions;
+                    recipe.prepTime = prepTime ? parseInt(prepTime) : null;
+                    recipe.image = image || null;
+                    recipe.tags = tagBuffer;
+                }
+            } else {
+                recipes[category].push({
+                    id: Date.now(),
+                    name, category, ingredients, instructions,
+                    prepTime: prepTime ? parseInt(prepTime) : null,
+                    image: image || null,
+                    tags: tagBuffer,
+                    rating: 0
+                });
+            }
+
+            saveRecipes();
+            document.getElementById('recipe-modal').classList.remove('show');
+            document.getElementById('recipe-form').reset();
+            tagBuffer = [];
+            renderRecipes();
+        }
+
+        function deleteRecipe(id) {
+            if (confirm('Delete this recipe?')) {
+                Object.keys(recipes).forEach(cat => {
+                    if (Array.isArray(recipes[cat])) recipes[cat] = recipes[cat].filter(r => r.id !== id);
+                });
+                saveRecipes();
+                renderRecipes();
+            }
+        }
+
+        function shareRecipe(id) {
+            const allRecipes = Object.values(recipes).flat();
+            const recipe = allRecipes.find(r => r.id === id);
+            if (!recipe) return;
+
+            const shareCode = btoa(JSON.stringify(recipe));
+            const shareLink = `${window.location.origin}${window.location.pathname}?recipe=${shareCode}`;
+
+            document.getElementById('share-link').value = shareLink;
+            document.getElementById('share-code').value = shareCode;
+            document.getElementById('share-modal').classList.add('show');
+        }
+
+        function toggleFavorite(id) {
+            let favorites = JSON.parse(localStorage.getItem('userFavorites')) || [];
+            const index = favorites.findIndex(f => f.id === id);
+            
+            if (index > -1) {
+                favorites.splice(index, 1);
+            } else {
+                const allRecipes = Object.values(recipes).flat();
+                const recipe = allRecipes.find(r => r.id === id);
+                if (recipe) {
+                    favorites.push(recipe);
+                }
+            }
+            
+            localStorage.setItem('userFavorites', JSON.stringify(favorites));
+            renderRecipes();
+        }
+
+        function isFavoritedFlag(id) {
+            const favorites = JSON.parse(localStorage.getItem('userFavorites')) || [];
+            return favorites.some(f => f.id === id);
+        }
+
+        function copyShareLink() {
+            document.getElementById('share-link').select();
+            document.execCommand('copy');
+            alert('Link copied!');
+        }
+
+        function copyShareCode() {
+            document.getElementById('share-code').select();
+            document.execCommand('copy');
+            alert('Code copied!');
+        }
+
+        function saveRecipes() {
+            localStorage.setItem('userRecipes', JSON.stringify(recipes));
+        }
+
+        function checkForSharedRecipe() {
+            const params = new URLSearchParams(window.location.search);
+            const recipeCode = params.get('recipe');
+            if (recipeCode) {
+                try {
+                    const recipe = JSON.parse(atob(recipeCode));
+                    if (confirm(`Import "${recipe.name}"?`)) {
+                        if (!recipes[recipe.category]) recipes[recipe.category] = [];
+                        recipe.id = Date.now();
+                        recipes[recipe.category].push(recipe);
+                        saveRecipes();
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        renderRecipes();
+                        alert('Recipe imported!');
+                    }
+                } catch (e) {
+                    console.error('Import failed:', e);
+                }
+            }
+        }
+
+        init();
+        checkForSharedRecipe();
+    </script>
+</body>
+</html>

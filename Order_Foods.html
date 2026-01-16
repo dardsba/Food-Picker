@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Order Foods</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="CSS-Foodpicker.css">
+    <style>
+        body {
+            background: #f5f5f5;
+        }
+
+        .manage-page {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .manage-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .manage-header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+        }
+
+        .manage-header p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: white;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 200ms ease;
+        }
+
+        .back-link:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .form-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-card h2 {
+            color: var(--accent);
+            margin-top: 0;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 200ms ease;
+        }
+
+        .btn-add:hover {
+            background: #1565c0;
+        }
+
+        .foods-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .foods-card h2 {
+            color: var(--accent);
+            padding: 1.5rem;
+            border-bottom: 2px solid var(--accent);
+            margin: 0;
+        }
+
+        .food-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background 200ms ease;
+        }
+
+        .food-item:hover {
+            background: #f9f9f9;
+        }
+
+        .food-item:last-child {
+            border-bottom: none;
+        }
+
+        .food-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .food-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-delete {
+            padding: 0.5rem 1rem;
+            background: #ffebee;
+            color: #e53935;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 200ms ease;
+        }
+
+        .btn-delete:hover {
+            background: #e53935;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .manage-page {
+                margin: 1rem auto;
+            }
+
+            .manage-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="manage-page">
+        <a href="Untitled-1.html" class="back-link">← Back to Home</a>
+
+        <div class="manage-header">
+            <h1>🍽️ Order Foods</h1>
+            <p>Manage the food options for "What We Order Today?"</p>
+        </div>
+
+        <div class="form-card">
+            <h2>Add New Food</h2>
+            
+            <div class="form-group">
+                <label for="food-name">Food Name</label>
+                <input type="text" id="food-name" placeholder="e.g., Pizza" required>
+            </div>
+
+            <button class="btn-add" onclick="addFood()">➕ Add Food</button>
+        </div>
+
+        <div class="foods-card">
+            <h2>Current Foods</h2>
+            <div id="foods-list"></div>
+        </div>
+    </div>
+
+    <script>
+        let foods = [];
+
+        function init() {
+            loadFoods();
+            displayFoods();
+        }
+
+        function loadFoods() {
+            const stored = localStorage.getItem('orderFoods');
+            foods = stored ? JSON.parse(stored) : [
+                { id: 1, name: '🍕 Pizza' },
+                { id: 2, name: '🍔 Burger' },
+                { id: 3, name: '🍟 Fries' },
+                { id: 4, name: '🌮 Tacos' },
+                { id: 5, name: '🍣 Sushi' },
+                { id: 6, name: '🍝 Pasta' }
+            ];
+
+            if (!stored) {
+                saveFoods();
+            }
+        }
+
+        function saveFoods() {
+            localStorage.setItem('orderFoods', JSON.stringify(foods));
+        }
+
+        function displayFoods() {
+            const container = document.getElementById('foods-list');
+            
+            if (foods.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No foods yet. Add one above!</p></div>';
+                return;
+            }
+
+            container.innerHTML = foods.map(food => `
+                <div class="food-item">
+                    <div class="food-name">${food.name}</div>
+                    <div class="food-actions">
+                        <button class="btn-delete" onclick="deleteFood(${food.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addFood() {
+            const input = document.getElementById('food-name');
+            const name = input.value.trim();
+
+            if (!name) {
+                alert('Please enter a food name!');
+                return;
+            }
+
+            const newFood = {
+                id: Date.now(),
+                name: name
+            };
+
+            foods.push(newFood);
+            saveFoods();
+            displayFoods();
+            input.value = '';
+        }
+
+        function deleteFood(id) {
+            if (confirm('Delete this food?')) {
+                foods = foods.filter(f => f.id !== id);
+                saveFoods();
+                displayFoods();
+            }
+        }
+
+        // Allow Enter key to add food
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('food-name').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addFood();
+            });
+        });
+
+        init();
+    </script>
+</body>
+</html>

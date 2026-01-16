@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Order Options</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="CSS-Foodpicker.css">
+    <style>
+        .manage-header {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .manage-header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+        }
+
+        .manage-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .add-order-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-add {
+            flex: 1;
+            padding: 0.75rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 200ms ease;
+        }
+
+        .btn-add:hover {
+            background: #1565c0;
+        }
+
+        .btn-back {
+            padding: 0.75rem 1.5rem;
+            background: #f5f5f5;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 200ms ease;
+        }
+
+        .btn-back:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .orders-list {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .orders-list h2 {
+            color: var(--accent);
+            padding: 1.5rem;
+            border-bottom: 2px solid var(--accent);
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background 200ms ease;
+        }
+
+        .order-item:hover {
+            background: #f9f9f9;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .order-emoji {
+            font-size: 2rem;
+        }
+
+        .order-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 200ms ease;
+        }
+
+        .btn-edit {
+            background: #f0f0f0;
+            color: var(--accent);
+        }
+
+        .btn-edit:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-delete {
+            background: #ffebee;
+            color: #e53935;
+        }
+
+        .btn-delete:hover {
+            background: #e53935;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+        }
+
+        .empty-state h3 {
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .manage-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .manage-container {
+                margin: 1rem auto;
+                padding: 0 1rem;
+            }
+
+            .order-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .order-actions {
+                width: 100%;
+                margin-top: 1rem;
+            }
+
+            .btn-edit, .btn-delete {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="manage-header">
+        <h1>📋 Manage Order Options</h1>
+        <p>Add or edit the food options for "What We Order Today?"</p>
+        <a href="Untitled-1.html" class="btn-back" style="margin-top: 1rem;">← Back to Home</a>
+    </div>
+
+    <div class="manage-container">
+        <div class="add-order-form">
+            <h2 style="color: var(--accent); margin-top: 0;">Add New Order Option</h2>
+            
+            <div class="form-group">
+                <label for="order-emoji">Emoji</label>
+                <input type="text" id="order-emoji" placeholder="e.g., 🍕" maxlength="2">
+            </div>
+
+            <div class="form-group">
+                <label for="order-name">Order Name</label>
+                <input type="text" id="order-name" placeholder="e.g., Pizza" required>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-add" onclick="addOrder()">✓ Add Order</button>
+            </div>
+        </div>
+
+        <div class="orders-list">
+            <h2>Current Options</h2>
+            <div id="orders-container"></div>
+        </div>
+    </div>
+
+    <script>
+        let orders = [];
+
+        function init() {
+            loadOrders();
+            displayOrders();
+        }
+
+        function loadOrders() {
+            const stored = localStorage.getItem('orderOptions');
+            orders = stored ? JSON.parse(stored) : [
+                { id: 1, emoji: '🍕', name: 'Pizza' },
+                { id: 2, emoji: '🍔', name: 'Burger' },
+                { id: 3, emoji: '🍣', name: 'Sushi' },
+                { id: 4, emoji: '🍝', name: 'Pasta' }
+            ];
+
+            // Save defaults if nothing was stored
+            if (!stored) {
+                localStorage.setItem('orderOptions', JSON.stringify(orders));
+            }
+        }
+
+        function saveOrders() {
+            localStorage.setItem('orderOptions', JSON.stringify(orders));
+        }
+
+        function displayOrders() {
+            const container = document.getElementById('orders-container');
+            
+            if (orders.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No orders yet</h3><p>Add your first order option above!</p></div>';
+                return;
+            }
+
+            container.innerHTML = orders.map(order => `
+                <div class="order-item">
+                    <div class="order-info">
+                        <div class="order-emoji">${order.emoji}</div>
+                        <div class="order-name">${order.name}</div>
+                    </div>
+                    <div class="order-actions">
+                        <button class="btn-edit" onclick="editOrder(${order.id})">✏️ Edit</button>
+                        <button class="btn-delete" onclick="deleteOrder(${order.id})">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addOrder() {
+            const emoji = document.getElementById('order-emoji').value.trim();
+            const name = document.getElementById('order-name').value.trim();
+
+            if (!name) {
+                alert('Please enter an order name!');
+                return;
+            }
+
+            const newOrder = {
+                id: Date.now(),
+                emoji: emoji || '🍔',
+                name: name
+            };
+
+            orders.push(newOrder);
+            saveOrders();
+            displayOrders();
+
+            // Clear form
+            document.getElementById('order-emoji').value = '';
+            document.getElementById('order-name').value = '';
+        }
+
+        function editOrder(id) {
+            const order = orders.find(o => o.id === id);
+            if (!order) return;
+
+            const newName = prompt('Edit order name:', order.name);
+            if (newName && newName.trim()) {
+                order.name = newName.trim();
+                saveOrders();
+                displayOrders();
+            }
+        }
+
+        function deleteOrder(id) {
+            if (confirm('Delete this order option?')) {
+                orders = orders.filter(o => o.id !== id);
+                saveOrders();
+                displayOrders();
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
