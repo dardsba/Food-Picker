@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Food Picker – New recipe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page with-bottom-nav">
+    <div class="top-bar">
+      <div class="header">
+        <h2>New recipe</h2>
+        <div class="profile-icon">U</div>
+      </div>
+      <input class="search-input" placeholder="Search my recipes..." />
+    </div>
+
+    <section class="card my-recipes-card">
+      <div class="card-header-row">
+        <h3>Create a recipe</h3>
+        <a class="btn btn-outline btn-link" href="my_recipies.html">Back</a>
+      </div>
+      <p class="card-description">Fill in the details below.</p>
+    </section>
+
+    <form class="card form-grid">
+      <div class="form-group">
+        <label class="form-label" for="recipe-name">Name of the recipe</label>
+        <input class="form-input" id="recipe-name" name="recipe-name" type="text" placeholder="e.g., Lemon Herb Salmon" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="prep-time">Prep time</label>
+        <input class="form-input" id="prep-time" name="prep-time" type="text" placeholder="e.g., 25 minutes" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="category">Category</label>
+        <select class="form-select" id="category" name="category">
+          <option>Favorites</option>
+          <option>Baking</option>
+          <option>Dinner</option>
+          <option>Lunch</option>
+          <option>Brunch</option>
+          <option>Breakfast</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="image-url">Image (URL)</label>
+        <input class="form-input" id="image-url" name="image-url" type="url" placeholder="https://..." />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="tags">User notes / Tags</label>
+        <input class="form-input" id="tags" name="tags" type="text" placeholder="e.g., vegan, fast, easy" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="ingredients">Ingredients</label>
+        <textarea class="form-textarea" id="ingredients" name="ingredients" placeholder="List ingredients here..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="instructions">Instructions</label>
+        <textarea class="form-textarea" id="instructions" name="instructions" placeholder="Step-by-step instructions..."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-outline" type="reset">Clear</button>
+        <button class="btn btn-primary" type="button">Save recipe</button>
+      </div>
+    </form>
+
+    <div class="page-bottom-space"></div>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Primary">
+    <div class="tabs">
+      <a class="tab" href="index.html">Home</a>
+      <a class="tab" href="#">Discover</a>
+      <a class="tab active" href="my_recipies.html">My recipes</a>
+      <a class="tab" href="#">History</a>
+      <a class="tab" href="#">User Space</a>
+    </div>
+  </nav>
+</body>
+</html>

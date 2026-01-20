@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Food Picker – My recipes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page with-bottom-nav">
+    <div class="top-bar">
+      <!-- HEADER -->
+      <div class="header">
+        <h2>Food Picker</h2>
+        <div class="profile-icon">U</div>
+      </div>
+
+      <!-- SEARCH -->
+      <input class="search-input" placeholder="Search my recipes..." />
+    </div>
+
+    <!-- MAIN CONTENT: NEW RECIPE + CATEGORIES -->
+    <section class="card my-recipes-card">
+      <div class="card-header-row">
+        <h3>My recipes</h3>
+        <!-- Visible New recipe button -->
+        <a class="btn btn-primary btn-link" href="new_recipe.html">+ New recipe</a>
+      </div>
+      <p class="card-description">
+        Choose a category to see your recipes. “Favorites” cannot be renamed or deleted.
+      </p>
+    </section>
+
+    <div class="category-list">
+      <a class="card category-card" href="category_favorites.html">
+        <div>
+          <div class="category-card-title">Favorites</div>
+          <div class="category-card-subtitle">2 recipes</div>
+        </div>
+        <div class="category-card-arrow">›</div>
+      </a>
+      <a class="card category-card" href="category_baking.html">
+        <div>
+          <div class="category-card-title">Baking</div>
+          <div class="category-card-subtitle">1 recipe</div>
+        </div>
+        <div class="category-card-arrow">›</div>
+      </a>
+      <a class="card category-card" href="category_dinner.html">
+        <div>
+          <div class="category-card-title">Dinner</div>
+          <div class="category-card-subtitle">2 recipes</div>
+        </div>
+        <div class="category-card-arrow">›</div>
+      </a>
+      <a class="card category-card" href="category_lunch.html">
+        <div>
+          <div class="category-card-title">Lunch</div>
+          <div class="category-card-subtitle">1 recipe</div>
+        </div>
+        <div class="category-card-arrow">›</div>
+      </a>
+      <a class="card category-card" href="category_brunch.html">
+        <div>
+          <div class="category-card-title">Brunch</div>
+          <div class="category-card-subtitle">1 recipe</div>
+        </div>
+        <div class="category-card-arrow">›</div>
+      </a>
+      <a class="card category-card" href="category_breakfast.html">
+        <div>
+          <div class="category-card-title">Breakfast</div>
+          <div class="category-card-subtitle">1 recipe</div>
+        </div>
+        <div class="category-card-arrow">›</div>
+      </a>
+    </div>
+
+    <div class="page-bottom-space"></div>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Primary">
+    <div class="tabs">
+      <a class="tab" href="index.html">Home</a>
+      <a class="tab" href="#">Discover</a>
+      <a class="tab active" href="my_recipies.html">My recipes</a>
+      <a class="tab" href="#">History</a>
+      <a class="tab" href="#">User Space</a>
+    </div>
+  </nav>
+</body>
+</html>

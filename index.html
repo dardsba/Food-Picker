@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Food Picker – Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page with-bottom-nav">
+    <div class="top-bar">
+      <!-- HEADER -->
+      <div class="header">
+        <h2>What we order today?</h2>
+        <div class="profile-icon">U</div>
+      </div>
+      <!-- SEARCH -->
+      <input class="search-input" placeholder="Search recipes..." />
+    </div>
+    <!-- WHAT WE MAKE TODAY -->
+    <section class="card">
+      <h3>What we make today?</h3>
+      <a class="recipe-preview" id="recipe-preview-link" href="#">
+        <div class="recipe-preview-image" id="recipe-preview-image"></div>
+        <div class="recipe-preview-title" id="recipe-preview-title"></div>
+      </a>
+      <button class="btn btn-primary" id="random-recipe-btn" type="button">Pick another</button>
+    </section>
+    <!-- WHAT DO WE HAVE AT HOME -->
+    <section class="card">
+      <h3>What do we have at home?</h3>
+      <div class="chip-bar">
+        <div class="chip">Pasta</div>
+        <div class="chip">Chicken</div>
+        <div class="chip">Tomatoes</div>
+      </div>
+      <div class="input-row">
+        <input class="input-small" placeholder="Add ingredient..." />
+        <button class="btn-small btn-outline">Add</button>
+      </div>
+      <button class="btn btn-outline btn-full">
+        Filter favorites by ingredients
+      </button>
+    </section>
+    <!-- 🎲 RANDOM ORDER GAME -->
+    <section class="random-card">
+      <h3>Random food picker</h3>
+      <p class="muted-text">
+        Play a fun game and let us pick a food for you &amp; send it to your friend/husband!
+      </p>
+      <!-- Compact food type chips -->
+      <div class="chip-bar">
+        <div class="chip">Pizza</div>
+        <div class="chip">Sushi</div>
+        <div class="chip">Burgers</div>
+      </div>
+      <!-- Add custom type -->
+      <div class="input-row">
+        <input class="input-small" placeholder="Add food type" />
+        <button class="btn-small btn-outline">Add</button>
+      </div>
+      <!-- Small add friend button -->
+      <button class="btn-small btn-outline">+ Add friend</button>
+      <!-- Randomize -->
+      <button class="random-btn">🎲 Randomize &amp; Send</button>
+    </section>
+    <!-- DISCOVER -->
+    <section class="card">
+      <h3>Discover</h3>
+      <p>Recommended recipes and sources.</p>
+    </section>
+    <!-- PREVIOUS -->
+    <section>
+      <h3>Previous recipes picked</h3>
+      <div class="previous-list">
+        <div class="previous-card">
+          <div class="previous-img"></div>
+          <div class="previous-body">Pasta Carbonara</div>
+        </div>
+        <div class="previous-card">
+          <div class="previous-img"></div>
+          <div class="previous-body">Chicken Curry</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Primary">
+    <div class="tabs">
+      <a class="tab active" href="index.html">Home</a>
+      <a class="tab" href="#">Discover</a>
+      <a class="tab" href="my_recipies.html">My recipes</a>
+      <a class="tab" href="#">History</a>
+      <a class="tab" href="#">User Space</a>
+    </div>
+  </nav>
+
+  <script>
+    const recipes = [
+      {
+        title: "Quick Veggie Pasta",
+        image:
+          "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=60",
+        link: "recipe_veggie_pasta.html"
+      },
+      {
+        title: "Cinnamon Banana Bread",
+        image:
+          "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=900&q=60",
+        link: "recipe_banana_bread.html"
+      },
+      {
+        title: "Lemon Herb Salmon",
+        image:
+          "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=60",
+        link: "recipe_lemon_salmon.html"
+      },
+      {
+        title: "Mediterranean Bowl",
+        image:
+          "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?auto=format&fit=crop&w=900&q=60",
+        link: "recipe_mediterranean_bowl.html"
+      }
+    ];
+
+    const randomButton = document.getElementById("random-recipe-btn");
+    const previewLink = document.getElementById("recipe-preview-link");
+    const previewImage = document.getElementById("recipe-preview-image");
+    const previewTitle = document.getElementById("recipe-preview-title");
+
+    const setRandomRecipe = () => {
+      const randomIndex = Math.floor(Math.random() * recipes.length);
+      const recipe = recipes[randomIndex];
+      previewLink.href = recipe.link;
+      previewImage.style.backgroundImage = `url('${recipe.image}')`;
+      previewTitle.textContent = recipe.title;
+    };
+
+    if (randomButton) {
+      randomButton.addEventListener("click", setRandomRecipe);
+    }
+
+    setRandomRecipe();
+  </script>
+</body>
+</html>
