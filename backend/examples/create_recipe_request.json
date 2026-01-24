@@ -1,0 +1,22 @@
+{
+  "title": "Quick Veggie Pasta",
+  "description": "A fast and healthy pasta recipe with seasonal vegetables.",
+  "ingredients": [
+    "200g pasta",
+    "1 cup cherry tomatoes",
+    "1 zucchini, sliced",
+    "2 cloves garlic",
+    "2 tbsp olive oil",
+    "salt",
+    "pepper"
+  ],
+  "steps": [
+    "Cook pasta according to package instructions.",
+    "Sauté garlic and zucchini in olive oil until tender.",
+    "Add cherry tomatoes and cook 2 more minutes.",
+    "Toss vegetables with pasta, season and serve."
+  ],
+  "images": [],
+  "tags": ["quick", "vegetarian", "dinner"],
+  "language": "en"
+}

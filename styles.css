@@ -47,6 +47,23 @@ body {
 	margin-bottom: 12px;
 }
 
+.header-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.user-info {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.user-name {
+	font-size: 0.85rem;
+	font-weight: 600;
+}
+
 .profile-icon {
 	width: 32px;
 	height: 32px;
@@ -149,6 +166,59 @@ body {
 .btn-small {
 	padding: 6px 12px;
 	font-size: 0.8rem;
+}
+
+.btn-signin {
+	background: #fff;
+	border: 1px solid #e6e6e6;
+	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+}
+
+.btn-google {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	background: #fff;
+	border: 1px solid #e6e6e6;
+	color: #111;
+}
+
+.google-icon {
+	width: 18px;
+	height: 18px;
+	background: url("https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg") center/contain no-repeat;
+	display: inline-block;
+}
+
+/* --- Login page --- */
+.login-page {
+	padding-top: 24px;
+}
+
+.login-hero {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 18px;
+}
+
+.login-hero-image {
+	width: 160px;
+	height: 220px;
+	border-radius: 16px;
+	background: #e9eef4 url("https://images.unsplash.com/photo-1459666644539-a9755287d6b0?auto=format&fit=crop&w=500&q=60") center/cover no-repeat;
+	box-shadow: var(--shadow);
+}
+
+.login-card {
+	text-align: center;
+}
+
+.login-title {
+	margin: 0 0 6px;
+}
+
+.login-footer {
+	text-align: center;
 }
 
 .btn-full {

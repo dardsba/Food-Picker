@@ -1,0 +1,89 @@
+{
+  "info": {
+    "name": "Food-Picker API (local)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0",
+    "description": "Quick Postman collection for local development against http://localhost:8000"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "http://localhost:8000/api/health"
+      },
+      "response": [
+        {
+          "name": "Health example",
+          "originalRequest": {},
+          "status": "200 OK",
+          "body": "{\n  \"ok\": true\n}",
+          "header": []
+        }
+      ]
+    },
+    {
+      "name": "List Recipes (paginated)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key":"Accept","value":"application/json"}
+        ],
+        "url": {
+          "raw": "http://localhost:8000/api/recipes?page=1&per_page=20",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api","recipes"],
+          "query": [
+            {"key":"page","value":"1"},
+            {"key":"per_page","value":"20"}
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Recipes list example",
+          "status": "200 OK",
+          "body": "REPLACE_WITH_backend/examples/recipes_list_response.json"
+        }
+      ]
+    },
+    {
+      "name": "Create Recipe",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key":"Content-Type","value":"application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "REPLACE_WITH_backend/examples/create_recipe_request.json"
+        },
+        "url": "http://localhost:8000/api/recipes"
+      },
+      "response": [
+        {
+          "name": "Create response example",
+          "status": "200 OK",
+          "body": "REPLACE_WITH_backend/examples/create_recipe_response.json"
+        }
+      ]
+    },
+    {
+      "name": "Upload Image",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {"key":"file","type":"file","src":"/path/to/image.jpg"}
+          ]
+        },
+        "url": "http://localhost:8000/api/images/upload"
+      }
+    }
+  ]
+}

@@ -1,0 +1,394 @@
+openapi: 3.0.3
+info:
+  title: Food Picker API
+  version: "1.0.0"
+  description: API contract for the Food Picker backend (feature/mvp-initial). Includes extended pagination and filtering for recipes.
+servers:
+  - url: http://localhost:8000
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session
+      description: "Server-side session cookie used by Starlette/SessionMiddleware"
+  schemas:
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        name:
+          type: string
+        picture:
+          type: string
+          format: uri
+        created_at:
+          type: string
+          format: date-time
+
+    Recipe:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        ingredients:
+          type: array
+          items:
+            type: string
+        steps:
+          type: array
+          items:
+            type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        tags:
+          type: array
+          items:
+            type: string
+        language:
+          type: string
+          description: Two-letter language tag (e.g. en, es)
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    RecipeInput:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        ingredients:
+          type: array
+          items:
+            type: string
+        steps:
+          type: array
+          items:
+            type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        tags:
+          type: array
+          items:
+            type: string
+        language:
+          type: string
+
+    PaginatedRecipes:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipe'
+        total:
+          type: integer
+        page:
+          type: integer
+        per_page:
+          type: integer
+
+paths:
+  /api/health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+
+  /api/auth/login:
+    get:
+      tags:
+        - Auth
+      summary: Start OAuth login (redirect)
+      responses:
+        '302':
+          description: Redirect to provider
+
+  /api/auth/callback:
+    get:
+      tags:
+        - Auth
+      summary: OAuth callback (redirects to frontend after login)
+      responses:
+        '302':
+          description: Redirect to frontend after successful login
+        '400':
+          description: Failed to retrieve user info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout (clears session)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+      security:
+        - sessionCookie: []
+
+  /api/me:
+    get:
+      tags:
+        - User
+      summary: Get current authenticated user
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - sessionCookie: []
+
+  /api/recipes:
+    get:
+      tags:
+        - Recipes
+      summary: List recipes (supports pagination and filtering)
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: tag
+          schema:
+            type: string
+          description: Filter by single tag
+        - in: query
+          name: language
+          schema:
+            type: string
+          description: Filter by recipe language (e.g. en)
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Full-text search in title/description
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [created_at, -created_at]
+          description: Sort order (prefix with '-' for desc)
+      responses:
+        '200':
+          description: Paginated list of recipes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRecipes'
+      security:
+        - sessionCookie: []
+
+    post:
+      tags:
+        - Recipes
+      summary: Create a recipe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipeInput'
+      responses:
+        '200':
+          description: Created recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '401':
+          description: Not authenticated
+      security:
+        - sessionCookie: []
+
+  /api/recipes/{recipe_id}:
+    get:
+      tags:
+        - Recipes
+      summary: Get a recipe by id
+      parameters:
+        - in: path
+          name: recipe_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - sessionCookie: []
+
+    put:
+      tags:
+        - Recipes
+      summary: Update a recipe
+      parameters:
+        - in: path
+          name: recipe_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipeInput'
+      responses:
+        '200':
+          description: Updated recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '404':
+          description: Not found
+      security:
+        - sessionCookie: []
+
+    delete:
+      tags:
+        - Recipes
+      summary: Delete a recipe
+      parameters:
+        - in: path
+          name: recipe_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+        '404':
+          description: Not found
+      security:
+        - sessionCookie: []
+
+  /api/images/upload:
+    post:
+      tags:
+        - Images
+      summary: Upload an image file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: File uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+      security:
+        - sessionCookie: []
+
+  /uploads/{path}:
+    get:
+      summary: Static files served from uploads dir
+      parameters:
+        - in: path
+          name: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File served
+
+tags:
+  - name: Health
+  - name: Auth
+  - name: User
+  - name: Recipes
+  - name: Images

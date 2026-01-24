@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Food Picker – Sign in</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page login-page">
+    <div class="login-hero">
+      <div class="login-hero-image"></div>
+    </div>
+
+    <section class="card login-card">
+      <h2 class="login-title">Welcome to RecipeCloud</h2>
+      <p class="muted-text">Sign in to save your personal recipes and favorites.</p>
+      <button class="btn btn-google btn-full" id="login-google" type="button">
+        <span class="google-icon" aria-hidden="true"></span>
+        Continue with Google
+      </button>
+      <button class="btn btn-outline btn-full" id="logout" type="button" hidden>Sign out</button>
+    </section>
+
+    <section class="card login-footer">
+      <a class="btn btn-outline btn-full" href="index.html">Back to home</a>
+    </section>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Primary">
+    <div class="tabs">
+      <a class="tab" href="index.html">Home</a>
+      <a class="tab" href="#">Discover</a>
+      <a class="tab" href="my_recipies.html">My recipes</a>
+      <a class="tab" href="#">History</a>
+      <a class="tab" href="#">User Space</a>
+    </div>
+  </nav>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="firebase-auth.js"></script>
+</body>
+</html>
